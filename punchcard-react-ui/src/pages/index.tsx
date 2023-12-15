@@ -1,5 +1,5 @@
 import { Navigate } from "../router";
 
-export default function Home() {
+export default function IndexPage() {
   return <Navigate to="/login">Redirecting...</Navigate>;
 }
