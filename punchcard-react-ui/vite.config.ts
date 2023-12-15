@@ -6,8 +6,10 @@ export default defineConfig({
   plugins: [react(), generouted()],
   resolve: {
     alias: {
-      '@components': '/src/components',
-      '@lib': '/src/lib'
+      'components': '/src/components',
+      'lib': '/src/lib',
+      'assets': '/src/assets',
+      'router': '/src/router'
     }
   }
 });
