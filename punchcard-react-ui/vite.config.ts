@@ -4,5 +4,10 @@ import generouted from '@generouted/react-router/plugin'
 
 export default defineConfig({
   plugins: [react(), generouted()],
-  
+  resolve: {
+    alias: {
+      '@components': '/src/components',
+      '@lib': '/src/lib'
+    }
+  }
 });

@@ -23,7 +23,8 @@
     /* check components for imports */
     "baseUrl": "src",
     "paths": {
-      "components/*": ["components/*"]
+      "@components/*": ["components/*"],
+      "@lib/*": ["lib/*"]
     }
   },
   "include": ["src"],
