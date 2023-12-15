@@ -23,8 +23,9 @@
     /* check components for imports */
     "baseUrl": "src",
     "paths": {
-      "@components/*": ["components/*"],
-      "@lib/*": ["lib/*"]
+      "components/*": ["components/*"],
+      "lib/*": ["lib/*"],
+      "assets/*": ["assets/*"]
     }
   },
   "include": ["src"],

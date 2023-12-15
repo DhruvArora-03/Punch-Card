@@ -1,0 +1,23 @@
+.navbar {
+  background-color: cornflowerblue;
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  height: 80px;
+  white-space: nowrap;
+}
+
+.navbarItems {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 30px;
+  font-size: 20px;
+}
