@@ -1,3 +1,4 @@
+import NavBar from "components/NavBar";
 import { useAuth } from "lib/auth";
 import { Navigate, Outlet } from "react-router-dom";
 
@@ -7,5 +8,8 @@ export default function Layout() {
     return <Navigate to="/home" />;
   }
 
-  return <Outlet />;
+  return <>
+    <NavBar />
+    <Outlet />
+  </>;
 }
