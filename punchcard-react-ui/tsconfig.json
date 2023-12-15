@@ -21,7 +21,10 @@
     "noFallthroughCasesInSwitch": true,
 
     /* check components for imports */
-    "baseUrl": "src"
+    "baseUrl": "src",
+    "paths": {
+      "components/*": ["components/*"]
+    }
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

@@ -1,10 +1,5 @@
-
-import SampleComponent from "../components/SampleComponent";
+import { Navigate } from "../router";
 
 export default function Home() {
-  return <>
-    <h1>Home - test test</h1>
-    <SampleComponent />
-
-  </>
+  return <Navigate to="/login">Redirecting...</Navigate>;
 }
