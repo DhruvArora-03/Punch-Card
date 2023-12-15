@@ -8,7 +8,7 @@ export type Path =
   | `/login`
 
 export type Params = {
-  
+
 }
 
 export type ModalPath = never
