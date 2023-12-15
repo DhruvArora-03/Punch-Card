@@ -9,9 +9,33 @@
   width: 600px;
   height: 300px;
   border: 3px solid black;
-  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  box-shadow: 14px 14px 14px 0px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 20px;
+  padding: 0 50px;
+}
+
+.title {
+  text-shadow: 0 0 15px rgba(19, 103, 221, 0.56);
+}
+
+.input { 
+  box-shadow: 14px 14px 14px 0px rgba(0, 0, 0, 0.25);
+}
+
+.input * {
+  border: black solid 1px;
+  border-radius: 2px;
+}
+
+.button {
+  box-shadow: 5px 8px 8px 0px rgba(0, 0, 0, 0.25);
+  border: black solid 1px
+}
+
+.input:focus-within, .button:active, .button:hover {
+  box-shadow: 0 0 10px 5px rgba(19, 103, 221, 0.56);
 }
