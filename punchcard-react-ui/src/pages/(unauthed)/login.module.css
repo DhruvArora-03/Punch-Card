@@ -16,26 +16,29 @@
   justify-content: center;
   gap: 20px;
   padding: 0 50px;
+  border-radius: 10px;
 }
 
 .title {
   text-shadow: 0 0 15px rgba(19, 103, 221, 0.56);
 }
 
-.input { 
+.input {
   box-shadow: 14px 14px 14px 0px rgba(0, 0, 0, 0.25);
 }
 
 .input * {
-  border: black solid 1px;
+  border: 1px solid black;
   border-radius: 2px;
 }
 
 .button {
   box-shadow: 5px 8px 8px 0px rgba(0, 0, 0, 0.25);
-  border: black solid 1px
+  border: 1px solid black;
 }
 
-.input:focus-within, .button:active, .button:hover {
+.input:focus-within,
+.button:active,
+.button:hover {
   box-shadow: 0 0 10px 5px rgba(19, 103, 221, 0.56);
 }
