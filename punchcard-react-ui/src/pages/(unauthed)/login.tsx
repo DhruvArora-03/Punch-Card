@@ -50,6 +50,7 @@ export default function LoginPage() {
       <InputGroup className={styles.input}>
         <InputGroup.Text> Username: </InputGroup.Text>
         <Form.Control
+          id="username"
           onChange={formik.handleChange}
           value={formik.values.username}
         />
@@ -57,11 +58,13 @@ export default function LoginPage() {
       <InputGroup className={styles.input}>
         <InputGroup.Text> Password: </InputGroup.Text>
         <Form.Control
+          id="password"
+          type="password"
           onChange={formik.handleChange}
           value={formik.values.password}
         />
       </InputGroup>
-      <Button className={styles.button} /* onClick={() =>  signIn({ username: "temp" }) }*/> Submit </Button>
+      <Button className={styles.button} type="submit"> Submit </Button>
     </Form>
   </div>
 
