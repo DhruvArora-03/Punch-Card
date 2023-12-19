@@ -9,6 +9,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 var secretKey = []byte("change-this-to-an-actual-secret-key-later-because-this-is-not-very-secure-like-this-or-something-like-that-but-tbh-there's-no-way-that-anyone-ever-guesses-this-so-maybe-it-is-fine")
@@ -88,11 +89,16 @@ func main() {
 	r.HandleFunc("/login", LoginHandler).Methods("POST")
 	r.HandleFunc("/protected", ValidateToken(ProtectedHandler)).Methods("GET")
 
+	corsHandler := cors.Default().Handler(http.DefaultServeMux)
+
 	// Start the server
 	port := 8080
 	fmt.Printf("Server listening on port %d...\n", port)
 	http.Handle("/", r)
-	http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", port), corsHandler)
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
 }
 
 // ValidateToken is a middleware function to validate JWT tokens.
