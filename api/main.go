@@ -66,8 +66,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Respond with the generated token.
-	w.Write([]byte(tokenString))
+	// Respond with a JSON object containing the token and a custom message.
+	response := map[string]interface{}{
+		"token":   tokenString,
+		"message": "Login successful",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }
 
 // ProtectedHandler is a sample protected route that requires a valid JWT.
