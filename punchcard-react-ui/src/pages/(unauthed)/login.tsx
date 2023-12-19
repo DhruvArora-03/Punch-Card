@@ -1,11 +1,9 @@
-import styles from "./login.module.css"
-import Form from 'react-bootstrap/Form';
-import InputGroup from 'react-bootstrap/InputGroup';
-import Button from 'react-bootstrap/Button'
-import { useFormik } from "Formik";
-import { useSignIn } from 'react-auth-kit'
-import { useState } from "react";
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError } from 'axios';
+import { useFormik } from 'Formik';
+import { useState } from 'react';
+import { useSignIn } from 'react-auth-kit';
+import { Button, Form, InputGroup } from 'react-bootstrap';
+import styles from './login.module.css';
 
 export default function LoginPage() {
   const [error, setError] = useState("");
