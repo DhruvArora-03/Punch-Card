@@ -1,15 +1,15 @@
 import NavBar, { NavBarModes } from "components/NavBar";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
+import { useIsAuthenticated } from 'react-auth-kit';
 
-// import { useAuth } from "lib/auth";
-// import { Navigate, Outlet } from "react-router-dom";
+
 
 export default function Layout() {
-  // const { user } = useAuth();
+  const isAuthenticated = useIsAuthenticated()
 
-  // if (user) {
-  //   return <Navigate to="/home" />;
-  // }
+  if (isAuthenticated()) {
+    return <Navigate to="/home" />;
+  }
 
   return <>
     <NavBar mode={NavBarModes.UnAuthenticated} />

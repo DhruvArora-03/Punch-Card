@@ -1,7 +1,7 @@
-// import { useAuth } from "lib/auth";
+import { useSignOut } from "react-auth-kit";
 
 export default function LogOutPage() {
-  // const { signOut } = useAuth();
-  // signOut();
+  const signOut = useSignOut();
+  signOut();
   return <></>;
 }
