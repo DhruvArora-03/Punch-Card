@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -31,6 +32,11 @@ var users = map[string]string{
 
 // LoginHandler handles user login and generates a JWT upon successful login.
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	var user User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -86,11 +92,20 @@ func main() {
 // ValidateToken is a middleware function to validate JWT tokens.
 func ValidateToken(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tokenString := r.Header.Get("Authorization")
-		if tokenString == "" {
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
+
+		// Check if the header has the "Bearer " prefix
+		if !strings.HasPrefix(authHeader, "Bearer ") {
+			http.Error(w, "Invalid token format", http.StatusUnauthorized)
+			return
+		}
+
+		// Extract the token from the header
+		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
 		token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 			return secretKey, nil
@@ -101,7 +116,7 @@ func ValidateToken(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		if /*claims*/ _, ok := token.Claims.(*Claims); ok && token.Valid {
+		if _, ok := token.Claims.(*Claims); ok && token.Valid {
 			// Token is valid, proceed to the next handler.
 			next.ServeHTTP(w, r)
 		} else {
