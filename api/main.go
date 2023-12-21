@@ -1,13 +1,16 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 )
@@ -83,6 +86,24 @@ func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	// Connection parameters
+	dsn := "admin:admin@tcp(localhost:3306)/punchcard"
+
+	// Open a connection to the MySQL database
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	// Test the connection
+	err = db.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Connected to MySQL database!")
+
 	r := mux.NewRouter()
 
 	// Define routes
@@ -95,7 +116,7 @@ func main() {
 	port := 8080
 	fmt.Printf("Server listening on port %d...\n", port)
 	http.Handle("/", r)
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), corsHandler)
+	err = http.ListenAndServe(fmt.Sprintf(":%d", port), corsHandler)
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
