@@ -12,9 +12,14 @@ export default function NavBar({ mode }: NavBarProps) {
   return <div className={styles.navbar}>
     <img src={logo} className={styles.logo} />
     <div className={styles.navbarItems}>
-      <Link to="/login">Past Payments</Link>
-      <Link to="/login">Settings</Link>
-      {mode !== NavBarModes.UnAuthenticated && <Link to="/logout">Log Out</Link>}
+      {mode !== NavBarModes.UnAuthenticated &&
+        <>
+          <Link to="/">History</Link>
+          <Link to="/">Payments</Link>
+          <Link to="/">Settings</Link>
+          <Link to="/logout">Log Out</Link>
+        </>
+      }
     </div>
   </div>
 }
