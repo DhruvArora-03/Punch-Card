@@ -12,7 +12,7 @@ CREATE TABLE users (
     last_name VARCHAR(63) NOT NULL,
     hourly_pay DECIMAL(8, 2) NOT NULL,
     role VARCHAR(63) NOT NULL,
-    preferred_payment_method VARCHAR(255) NULL,
+    preferred_payment_method VARCHAR(255) NOT NULL,
     createdBy BIGINT UNSIGNED NOT NULL,
     createdAt DATETIME NOT NULL,
     updatedBy BIGINT UNSIGNED NOT NULL,
@@ -58,10 +58,10 @@ CREATE INDEX idx_user_id ON paychecks (user_id);
 -- Output: corresponding id, hashed_password, and salt
 DROP PROCEDURE IF EXISTS GetUserCredentials;
 CREATE PROCEDURE GetUserCredentials(
-    IN in_username VARCHAR(55),
+    IN in_username VARCHAR(63),
     OUT user_id_result BIGINT UNSIGNED,
-    OUT hashed_password_result VARCHAR(55),
-    OUT user_salt_result VARCHAR(55)
+    OUT hashed_password_result VARCHAR(63),
+    OUT user_salt_result VARCHAR(63)
 )
 BEGIN
     -- Retrieve user credentials based on the provided username
@@ -115,3 +115,6 @@ BEGIN
         NOW()
     );
 END
+
+-- @block
+SELECT * from users
