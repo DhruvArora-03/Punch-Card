@@ -22,6 +22,10 @@ var users = map[string]string{
 
 // LoginHandler handles user login and generates a JWT upon successful login.
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(time.Now())
+	fmt.Printf("%s ~/login\n\n", r.Method)
+	time.Sleep(2 * time.Second)
+	
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -84,6 +88,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 // ProtectedHandler is a sample protected route that requires a valid JWT.
 func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(time.Now())
+	fmt.Printf("%s ~/protected\n\n", r.Method)
+	time.Sleep(2 * time.Second)
 	fmt.Fprintf(w, "This is a protected route.")
 }
 
@@ -105,12 +112,14 @@ func main() {
 	}
 	defer db.Close()
 
-	corsHandler := cors.Default().Handler(http.DefaultServeMux)
+	r := setupRoutes()
+	// FIX THIS (dont know if we should actually allow all)
+	// when we use cors.Default() we get error on client about Access-control-allow-origin
+	corsHandler := cors.AllowAll().Handler(r)
 
 	// Start the server
 	port := 8080
 	fmt.Printf("Server listening on port %d...\n", port)
-	http.Handle("/", setupRoutes())
 	err = http.ListenAndServe(fmt.Sprintf(":%d", port), corsHandler)
 	if err != nil {
 		fmt.Println("Error:", err)
