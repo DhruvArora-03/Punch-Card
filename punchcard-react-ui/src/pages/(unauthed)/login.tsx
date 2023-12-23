@@ -8,6 +8,16 @@ import styles from './login.module.css';
 export default function LoginPage() {
   const [error, setError] = useState("");
   const signIn = useSignIn();
+  const encoder = new TextEncoder();
+
+  const hashPassword = async (password: string) => {
+    // encode
+    const passwordBuffer = encoder.encode(password);
+    // hash
+    return window.crypto.subtle.digest("SHA-256", passwordBuffer)
+      // decode
+      .then((hashBuffer) => Array.from(new Uint8Array(hashBuffer)).map(byte => byte.toString(16).padStart(2, '0')).join(''))
+  };
 
   const onSubmit = async (values: any) => {
     console.log("Values: ", values);
@@ -16,7 +26,10 @@ export default function LoginPage() {
     try {
       const response = await axios.post(
         "http://localhost:8080/login",
-        values
+        {
+          username: values.username,
+          password: await hashPassword(values.password)
+        }
       );
 
       signIn({
