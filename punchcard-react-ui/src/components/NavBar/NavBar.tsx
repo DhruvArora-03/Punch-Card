@@ -2,6 +2,7 @@ import { Link } from 'router'
 import styles from './NavBar.module.css'
 import logo from 'assets/gideon-logo.png'
 import { NavBarModes } from '.';
+import { useSignOut } from 'react-auth-kit';
 
 
 type NavBarProps = {
@@ -9,6 +10,8 @@ type NavBarProps = {
 }
 
 export default function NavBar({ mode }: NavBarProps) {
+  const signOut = useSignOut();
+
   return <div className={styles.navbar}>
     <img src={logo} className={styles.logo} />
     <div className={styles.navbarItems}>
@@ -17,7 +20,7 @@ export default function NavBar({ mode }: NavBarProps) {
           <Link to="/">History</Link>
           <Link to="/">Payments</Link>
           <Link to="/">Settings</Link>
-          <Link to="/logout">Log Out</Link>
+          <Link to="/login" onClick={() => { signOut() }}>Log Out</Link>
         </>
       }
     </div>
