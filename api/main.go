@@ -1,12 +1,12 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
+	"punchcard-api/auth"
+	"punchcard-api/db"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -14,20 +14,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 )
-
-var secretKey = []byte("change-this-to-an-actual-secret-key-later-because-this-is-not-very-secure-like-this-or-something-like-that-but-tbh-there's-no-way-that-anyone-ever-guesses-this-so-maybe-it-is-fine")
-
-// User represents a simple user structure for demonstration purposes.
-type User struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-// Claims represents the structure of JWT claims.
-type Claims struct {
-	Username string `json:"username"`
-	jwt.StandardClaims
-}
 
 // In-memory storage for simplicity (replace with a database in a real-world scenario).
 var users = map[string]string{
@@ -41,30 +27,46 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var user User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	// the expected request body
+	var request struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+	
+	// check if body matches
+	err := json.NewDecoder(r.Body).Decode(&request);
+	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
 	// Check if the username and password are valid.
-	password, ok := users[user.Username]
-	if !ok || password != user.Password {
+	userID, hashedPass, salt, err := db.GetUserCredentials(request.Username)
+	if err != nil {
+		http.Error(w, "database issue", http.StatusInternalServerError)
+	}
+
+	ok, err := auth.CheckPassword(hashedPass, request.Password, salt)
+	if err != nil {
+		http.Error(w, "internal issue", http.StatusInternalServerError)
+	}
+
+	if !ok {
 		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 		return
 	}
 
 	// Generate a JWT token.
 	expirationTime := time.Now().Add(5 * time.Minute)
-	claims := &Claims{
-		Username: user.Username,
+	claims := &auth.Claims{
+		UserID: fmt.Sprint(userID),
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(secretKey)
+	tokenString, err := token.SignedString(auth.SecretKey)
 	if err != nil {
 		http.Error(w, "Error generating token", http.StatusInternalServerError)
 		return
@@ -85,75 +87,34 @@ func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "This is a protected route.")
 }
 
-func main() {
-	// Connection parameters
-	dsn := "admin:admin@tcp(localhost:3306)/punchcard"
-
-	// Open a connection to the MySQL database
-	db, err := sql.Open("mysql", dsn)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	// Test the connection
-	err = db.Ping()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Connected to MySQL database!")
-
+func setupRoutes() (*mux.Router) {
 	r := mux.NewRouter()
 
 	// Define routes
 	r.HandleFunc("/login", LoginHandler).Methods("POST")
-	r.HandleFunc("/protected", ValidateToken(ProtectedHandler)).Methods("GET")
+	r.HandleFunc("/protected", auth.ValidateToken(ProtectedHandler)).Methods("GET")
+
+	return r
+}
+
+func main() {
+	// Open a connection to the MySQL database
+	db, err := db.ConnectToDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
 
 	corsHandler := cors.Default().Handler(http.DefaultServeMux)
 
 	// Start the server
 	port := 8080
 	fmt.Printf("Server listening on port %d...\n", port)
-	http.Handle("/", r)
+	http.Handle("/", setupRoutes())
 	err = http.ListenAndServe(fmt.Sprintf(":%d", port), corsHandler)
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
 }
 
-// ValidateToken is a middleware function to validate JWT tokens.
-func ValidateToken(next http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
 
-		// Check if the header has the "Bearer " prefix
-		if !strings.HasPrefix(authHeader, "Bearer ") {
-			http.Error(w, "Invalid token format", http.StatusUnauthorized)
-			return
-		}
-
-		// Extract the token from the header
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-
-		token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-			return secretKey, nil
-		})
-
-		if err != nil {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-
-		if _, ok := token.Claims.(*Claims); ok && token.Valid {
-			// Token is valid, proceed to the next handler.
-			next.ServeHTTP(w, r)
-		} else {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		}
-	})
-}
