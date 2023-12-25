@@ -7,11 +7,17 @@ type ButtonProps = {
   text?: string,
   disabled?: boolean,
   loading?: boolean,
-  type?: "button" | "submit" | "reset"
+  type?: "button" | "submit" | "reset",
+  onClick?: React.MouseEventHandler<HTMLButtonElement>
 };
 
 export default function ButtonComponent(props: ButtonProps) {
-  return <Button className={props.className} disabled={props.disabled || props.loading} type={props.type}>
+  return <Button
+    className={props.className}
+    disabled={props.disabled || props.loading}
+    type={props.type}
+    onClick={props.onClick}
+  >
     {props.loading
       ? <Spinner
         size="sm"

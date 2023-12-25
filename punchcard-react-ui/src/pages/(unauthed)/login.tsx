@@ -26,31 +26,29 @@ export default function LoginPage() {
     setError("")
     setIsLoading(true)
 
-    try {
-      hashPassword(values.password)
-        .then((hashedPassword: string) => axios.post(
-          "http://localhost:8080/login",
-          {
-            username: values.username,
-            password: hashedPassword
-          }
-        ))
-        .then((response: AxiosResponse) => signIn({
-          token: response.data.token,
-          tokenType: "Bearer",
-          expiresIn: 300,
-          authState: { username: values.username },
-        }))
-    } catch (err) {
-      if (err instanceof AxiosError) {
-        setError(err.response?.data.message)
-      } else if (err instanceof Error) {
-        setError(err.message)
-      }
-      console.log("Error: ", err);
-    }
-
-    setIsLoading(false)
+    await hashPassword(values.password)
+      .then((hashedPassword: string) => axios.post(
+        "http://localhost:8080/login",
+        {
+          username: values.username,
+          password: hashedPassword
+        }
+      ))
+      .then((response: AxiosResponse) => signIn({
+        token: response.data,
+        tokenType: "Bearer",
+        expiresIn: 300,
+        authState: { username: values.username },
+      }))
+      .catch((err) => {
+        if (err instanceof AxiosError) {
+          setError(err.response?.data.message)
+        } else if (err instanceof Error) {
+          setError(err.message)
+        }
+        console.log("Error: ", err);
+      })
+      .then(() => setIsLoading(false))
   };
 
   const formik = useFormik({
