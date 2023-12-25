@@ -1,12 +1,14 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'Formik';
 import { useState } from 'react';
 import { useSignIn } from 'react-auth-kit';
-import { Button, Form, InputGroup } from 'react-bootstrap';
+import { Form, InputGroup } from 'react-bootstrap';
 import styles from './login.module.css';
+import Button from 'components/Button';
 
 export default function LoginPage() {
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const signIn = useSignIn();
   const encoder = new TextEncoder();
 
@@ -20,31 +22,35 @@ export default function LoginPage() {
   };
 
   const onSubmit = async (values: any) => {
-    console.log("Values: ", values);
-    setError("");
+    console.log("Values: ", values)
+    setError("")
+    setIsLoading(true)
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/login",
-        {
-          username: values.username,
-          password: await hashPassword(values.password)
-        }
-      );
-
-      signIn({
-        token: response.data.token,
-        tokenType: "Bearer",
-        expiresIn: 300,
-        authState: { username: values.username },
-      });
+      hashPassword(values.password)
+        .then((hashedPassword: string) => axios.post(
+          "http://localhost:8080/login",
+          {
+            username: values.username,
+            password: hashedPassword
+          }
+        ))
+        .then((response: AxiosResponse) => signIn({
+          token: response.data.token,
+          tokenType: "Bearer",
+          expiresIn: 300,
+          authState: { username: values.username },
+        }))
     } catch (err) {
-      if (err && err instanceof AxiosError)
-        setError(err.response?.data.message);
-      else if (err && err instanceof Error) setError(err.message);
-
+      if (err instanceof AxiosError) {
+        setError(err.response?.data.message)
+      } else if (err instanceof Error) {
+        setError(err.message)
+      }
       console.log("Error: ", err);
     }
+
+    setIsLoading(false)
   };
 
   const formik = useFormik({
@@ -75,7 +81,7 @@ export default function LoginPage() {
           value={formik.values.password}
         />
       </InputGroup>
-      <Button className={styles.button} type="submit"> Submit </Button>
+      <Button className={styles.button} type="submit" loading={isLoading} text="Submit" />
     </Form>
   </div>
 

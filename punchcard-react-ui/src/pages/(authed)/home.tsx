@@ -1,7 +1,9 @@
 import axios from "axios";
 import { useMemo, useState } from "react";
-import { Button, Spinner } from "react-bootstrap";
+import { Spinner } from "react-bootstrap";
 import { useAuthHeader } from "react-auth-kit"
+import styles from './home.module.css';
+import Button from "components/Button"
 
 export default function HomePage() {
   const authHeader = useAuthHeader();
@@ -28,7 +30,7 @@ export default function HomePage() {
     <h1>
       this is home page to be shown after user is logged in
     </h1>
-    <Button>Clock In</Button>
+    <Button className={styles.button} text="Clock In" />
   </>
 
 }
