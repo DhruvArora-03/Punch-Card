@@ -114,7 +114,59 @@ BEGIN
         in_creator_id,
         NOW()
     );
-END
+END;
+
+DROP PROCEDURE IF EXISTS ClockIn;
+CREATE PROCEDURE ClockIn (
+    IN in_user_id BIGINT UNSIGNED,
+    IN in_clock_in DATETIME
+)
+BEGIN
+    INSERT INTO shifts (
+        user_id,
+        paycheck_id,
+        clock_in,
+        clock_out,
+        user_notes,
+        admin_notes,
+        createdBy,
+        createdAt,
+        updatedBy,
+        updatedAt
+    ) VALUES (
+        in_user_id,
+        NULL,
+        in_clock_in,
+        NULL,
+        NULL,
+        NULL,
+        in_user_id,
+        NOW(),
+        in_user_id,
+        NOW()
+    );
+END;
+
+DROP PROCEDURE IF EXISTS ClockOut;
+CREATE PROCEDURE ClockOut (
+    IN in_user_id BIGINT UNSIGNED,
+    IN in_shift_id BIGINT UNSIGNED,
+    IN in_clock_out DATETIME
+)
+BEGIN
+    UPDATE shifts
+    SET
+        clock_out = in_clock_out,
+        updatedBy = in_user_id,
+        updatedAt = NOW()
+    WHERE
+        id = in_shift_id AND
+        user_id = in_user_id AND
+        clock_out IS NULL; -- Only update if the shift has not been clocked out before
+END;
 
 -- @block
 SELECT * from users
+
+-- @block
+SELECT * from shifts
