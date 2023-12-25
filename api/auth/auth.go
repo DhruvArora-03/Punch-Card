@@ -3,17 +3,19 @@ package auth
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var SecretKey = []byte("change-this-to-an-actual-secret-key-later-because-this-is-not-very-secure-like-this-or-something-like-that-but-tbh-there's-no-way-that-anyone-ever-guesses-this-so-maybe-it-is-fine")
+var secretKey = []byte("change-this-to-an-actual-secret-key-later-because-this-is-not-very-secure-like-this-or-something-like-that-but-tbh-there's-no-way-that-anyone-ever-guesses-this-so-maybe-it-is-fine")
 
 // Claims represents the structure of JWT claims.
-type Claims struct {
+type claims struct {
 	UserID string
 	jwt.StandardClaims
 }
@@ -56,38 +58,77 @@ func CheckPassword(actualHash string, password string, salt string) (bool, error
 	return bcrypt.CompareHashAndPassword([]byte(actualHash), decoded) == nil, nil
 }
 
+// input: userID
+// output: tokenString
+func GenerateJWT(userID string) (string, error) {
+	expirationTime := time.Now().Add(5 * time.Minute)
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims{
+		UserID: userID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		},
+	})
+
+	return token.SignedString(secretKey)
+}
+
+func extractToken(r *http.Request) (*jwt.Token, error) {
+	authHeader := r.Header.Get("Authorization")
+
+	// Check if the header exists
+	if authHeader == "" {
+		return nil, errors.New("Authorization not found")
+	}
+
+	// Check if the header has the "Bearer " prefix
+	if !strings.HasPrefix(authHeader, "Bearer ") {
+		return nil, errors.New("Invalid token format")
+	}
+
+	// Extract the token from the header
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+	token, err := jwt.ParseWithClaims(tokenString, &claims{}, func(token *jwt.Token) (interface{}, error) {
+		return secretKey, nil
+	})
+
+	if err != nil {
+		return nil, errors.New("Could not parse authorization token")
+	}
+
+	return token, nil
+}
+
+func ExtractUserID(r *http.Request) (string, error) {
+	token, err := extractToken(r)
+	if err != nil {
+		return "", err
+	}
+
+	// Check that the token matches the expected format
+	claims, ok := token.Claims.(*claims)
+	if ok && token.Valid {
+		// Return the user ID from the claims
+		return claims.UserID, nil
+	}
+
+	return "", errors.New("Invalid authorization token")
+}
+
+
 // ValidateToken is a middleware function to validate JWT tokens.
 func ValidateToken(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authHeader := r.Header.Get("Authorization")
-		
-		// Check if the header exists
-		if authHeader == "" {
-			http.Error(w, "Authorization not found", http.StatusUnauthorized)
-			return
-		}
-
-		// Check if the header has the "Bearer " prefix
-		if !strings.HasPrefix(authHeader, "Bearer ") {
-			http.Error(w, "Invalid token format", http.StatusUnauthorized)
-			return
-		}
-
-		// Extract the token from the header
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-
-		token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-			return SecretKey, nil
-		})
-
+		token, err := extractToken(r)
 		if err != nil {
-			http.Error(w, "Could not parse authorization token", http.StatusUnauthorized)
-			return
+			http.Error(w, err.Error(), http.StatusUnauthorized)
 		}
+
 
 		// check that the token matches format
-		_, ok := token.Claims.(*Claims);
-		if  ok && token.Valid {
+		_, ok := token.Claims.(*claims);
+		if ok && token.Valid {
 			// Token is valid, proceed to the next handler.
 			next.ServeHTTP(w, r)
 		} else {
