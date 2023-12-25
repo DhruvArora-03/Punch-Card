@@ -68,6 +68,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Respond with just the token string.
 	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(tokenString))
 }
 
