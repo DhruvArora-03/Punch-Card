@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"punchcard-api/auth"
 	"punchcard-api/db"
+	"punchcard-api/shifts"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
@@ -53,44 +53,29 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	ok, err := auth.CheckPassword(hashedPass, request.Password, salt)
 	if err != nil {
 		http.Error(w, "internal issue", http.StatusInternalServerError)
-	}
-
-	if !ok {
+		return
+	} else if !ok {
 		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 		return
 	}
 
 	// Generate a JWT token.
-	expirationTime := time.Now().Add(5 * time.Minute)
-	claims := &auth.Claims{
-		UserID: fmt.Sprint(userID),
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(auth.SecretKey)
+	tokenString, err := auth.GenerateJWT(fmt.Sprint(userID))
 	if err != nil {
 		http.Error(w, "Error generating token", http.StatusInternalServerError)
 		return
 	}
 
-	// Respond with a JSON object containing the token and a custom message.
-	response := map[string]interface{}{
-		"token":   tokenString,
-		"message": "Login successful",
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	// Respond with just the token string.
+	w.Header().Set("Content-Type", "text/plain")
+	w.Write([]byte(tokenString))
 }
 
 // ProtectedHandler is a sample protected route that requires a valid JWT.
 func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now())
 	fmt.Printf("%s ~/protected\n\n", r.Method)
-	time.Sleep(2 * time.Second)
+	time.Sleep(time.Second)
 	fmt.Fprintf(w, "This is a protected route.")
 }
 
@@ -100,6 +85,7 @@ func setupRoutes() (*mux.Router) {
 	// Define routes
 	r.HandleFunc("/login", LoginHandler).Methods("POST")
 	r.HandleFunc("/protected", auth.ValidateToken(ProtectedHandler)).Methods("GET")
+	r.HandleFunc("/clock-in", auth.ValidateToken(shifts.ClockInHandler)).Methods("POST")
 
 	return r
 }
