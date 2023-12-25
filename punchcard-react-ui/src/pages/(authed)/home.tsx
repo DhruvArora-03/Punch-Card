@@ -6,11 +6,16 @@ import styles from './home.module.css';
 import Button from "components/Button"
 
 async function clockIn(authHeader: () => string, setError: React.Dispatch<React.SetStateAction<string>>) {
-  await axios.post("http://localhost:8080/clock-in", {
-    headers: {
-      Authorization: authHeader()
+  await axios.post("http://localhost:8080/clock-in",
+    {
+      time: new Date().toJSON()
+    },
+    {
+      headers: {
+        Authorization: authHeader()
+      }
     }
-  }).catch((err) => {
+  ).catch((err) => {
     setError(err.message)
     console.log(err)
   })

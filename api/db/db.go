@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"time"
 )
 
 var db *sql.DB
@@ -53,6 +54,7 @@ func GetUserCredentials(username string) (int64, string, string, error) {
 	return id.Int64, hashPass.String, salt.String, nil
 }
 
-func ClockIn(userID string) {
-	
+func ClockIn(userID string, clockInTime time.Time) (error) {
+	_, err := db.Query("CALL ClockIn(?, ?)", userID, clockInTime)
+	return err
 }

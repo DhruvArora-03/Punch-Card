@@ -88,11 +88,9 @@ func extractToken(r *http.Request) (*jwt.Token, error) {
 
 	// Extract the token from the header
 	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-
 	token, err := jwt.ParseWithClaims(tokenString, &claims{}, func(token *jwt.Token) (interface{}, error) {
 		return secretKey, nil
 	})
-
 	if err != nil {
 		return nil, errors.New("Could not parse authorization token")
 	}
@@ -123,6 +121,7 @@ func ValidateToken(next http.HandlerFunc) http.HandlerFunc {
 		token, err := extractToken(r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
 		}
 
 
