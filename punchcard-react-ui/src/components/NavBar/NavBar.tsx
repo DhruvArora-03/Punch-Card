@@ -20,9 +20,9 @@ export default function NavBar({ mode }: NavBarProps) {
     <div className={styles.navbarItems}>
       {mode !== NavBarModes.UnAuthenticated &&
         <>
-          <Link to="/history">History</Link>
-          <Link to="/payments">Payments</Link>
-          <Link to="/settings">Settings</Link>
+          <Link to="/">History</Link>
+          <Link to="/">Payments</Link>
+          <Link to="/">Settings</Link>
           <Link to="/login" onClick={() => { signOut() }}>Log Out</Link>
         </>
       }
