@@ -110,9 +110,9 @@ BEGIN
         in_role,
         in_preferred_payment_method,
         in_creator_id,
-        NOW(),
+        UTC_TIMESTAMP(),
         in_creator_id,
-        NOW()
+        UTC_TIMESTAMP()
     );
 END;
 
@@ -141,16 +141,15 @@ BEGIN
         NULL,
         NULL,
         in_user_id,
-        NOW(),
+        UTC_TIMESTAMP(),
         in_user_id,
-        NOW()
+        UTC_TIMESTAMP()
     );
 END;
 
 DROP PROCEDURE IF EXISTS ClockOut;
 CREATE PROCEDURE ClockOut (
     IN in_user_id BIGINT UNSIGNED,
-    IN in_shift_id BIGINT UNSIGNED,
     IN in_clock_out DATETIME
 )
 BEGIN
@@ -158,11 +157,36 @@ BEGIN
     SET
         clock_out = in_clock_out,
         updatedBy = in_user_id,
-        updatedAt = NOW()
+        updatedAt = UTC_TIMESTAMP()
     WHERE
-        id = in_shift_id AND
         user_id = in_user_id AND
         clock_out IS NULL; -- Only update if the shift has not been clocked out before
+END;
+
+DROP PROCEDURE IF EXISTS GetClockInStatus;
+CREATE PROCEDURE GetClockInStatus (
+    IN in_user_id BIGINT UNSIGNED,
+    OUT clock_in_time_result DATETIME
+)
+BEGIN
+    SELECT clock_in
+    INTO clock_in_time_result
+    FROM shifts
+    WHERE 
+        user_id = in_user_id AND
+        clock_out IS NULL;
+END;
+
+DROP PROCEDURE IF EXISTS GetFirstName;
+CREATE PROCEDURE GetFirstName (
+    IN in_user_id BIGINT UNSIGNED,
+    OUT first_name_result VARCHAR(63)
+)
+BEGIN
+    SELECT first_name
+    INTO first_name_result
+    FROM users
+    WHERE id = in_user_id;
 END;
 
 -- @block

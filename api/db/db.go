@@ -28,15 +28,7 @@ func ConnectToDB() (*sql.DB, error) {
 }
 
 func GetUserCredentials(username string) (int64, string, string, error) {
-	rows, err := db.Query("CALL GetUserCredentials(?, @user_id, @user_hashed_password, @user_salt)", username)
-	if err != nil {
-		return -1, "", "", err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		// nothing????? for some reason doesn't work without this loop
-	}
+	_, err := db.Exec("CALL GetUserCredentials(?, @user_id, @user_hashed_password, @user_salt)", username)
 
 	// Retrieve the output variables
 	var id sql.NullInt64
@@ -54,7 +46,48 @@ func GetUserCredentials(username string) (int64, string, string, error) {
 	return id.Int64, hashPass.String, salt.String, nil
 }
 
+func GetFirstName(userID string) (string, error) {
+	_, err := db.Exec("CALL GetFirstName(?, @first_name)", userID)
+	if err != nil {
+		return "", err
+	}
+
+	var firstName sql.NullString
+	err = db.QueryRow("SELECT @first_name").Scan(&firstName)
+	if err != nil {
+		return "", err
+	}
+
+	return firstName.String, nil
+}
+
+func GetClockInStatus(userID string) (bool, time.Time, error) {
+	_, err := db.Exec("CALL GetClockInStatus(?, @clock_in_time)", userID)
+	if err != nil {
+		return false, time.Time{}, err
+	}
+
+	// Retrieve output
+	var clockInTime sql.NullString
+	err = db.QueryRow("SELECT @clock_in_time").Scan(&clockInTime)
+	if err != nil {
+		return false, time.Time{}, err
+	}
+
+	if clockInTime.Valid {
+		parsed, _ := time.Parse("2006-01-02 03:04:05", clockInTime.String)
+		return true, parsed, nil
+	}
+
+	return false, time.Time{}, nil
+}
+
 func ClockIn(userID string, clockInTime time.Time) (error) {
-	_, err := db.Query("CALL ClockIn(?, ?)", userID, clockInTime)
+	_, err := db.Exec("CALL ClockIn(?, ?)", userID, clockInTime)
+	return err
+}
+
+func ClockOut(userID string, clockInTime time.Time) (error) {
+	_, err := db.Exec("CALL ClockOut(?, ?)", userID, clockInTime)
 	return err
 }
