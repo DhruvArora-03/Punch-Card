@@ -30,11 +30,16 @@
 }
 
 .navbarItems > .activeItem {
-  background-color: rgb(44, 157, 255);
+  background-color: rgb(37, 135, 222);
   color: white;
 }
 
+.navbarItems > .activeItem:hover {
+  background-color: rgb(4, 96, 176);
+}
+
 .navbarItems > .item:hover:not(.activeItem) {
+  transform: none;
   background-color: rgba(163, 208, 248, 0.85);
 }
 
