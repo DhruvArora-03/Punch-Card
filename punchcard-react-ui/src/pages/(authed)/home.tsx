@@ -70,7 +70,7 @@ export default function HomePage() {
 
   if (axios.isAxiosError(error) && error.response?.status == 401) {
     signOut()
-    return <Navigate to="login" />
+    return <Navigate to="/login" />
   }
 
   return <>
