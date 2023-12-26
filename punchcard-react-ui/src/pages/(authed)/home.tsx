@@ -1,9 +1,9 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { useMemo, useState } from "react";
-import { Spinner } from "react-bootstrap";
-import { useAuthHeader } from "react-auth-kit"
+import { useAuthHeader, useSignOut } from "react-auth-kit"
 import styles from './home.module.css';
 import Button from "components/Button"
+import { Navigate } from "react-router";
 
 type setStateType<T> = React.Dispatch<React.SetStateAction<T>>
 type setStatusType = setStateType<{
@@ -14,21 +14,22 @@ type setStatusType = setStateType<{
 
 
 async function wrapper(callback: () => Promise<any>,
-  setError: setStateType<string>,
+  setError: setStateType<Error | null>,
   setIsLoading: setStateType<boolean>,
   setStatus: setStatusType
 ) {
   setIsLoading(true)
+  setError(null)
   await callback()
-    .then((res) =>
+    .then((response: AxiosResponse) =>
       setStatus({
-        name: res.data.name,
-        isClockedIn: res.data.is_clocked_in,
-        clockInTime: new Date(res.data.clock_in_time)
+        name: response.data.name,
+        isClockedIn: response.data.is_clocked_in,
+        clockInTime: new Date(response.data.clock_in_time)
       }))
     .catch((err) => {
-      setError(err.message)
-      console.log(err)
+      setError(err)
+      !(axios.isAxiosError(err) && err.response?.status == 401) && console.log(err)
     })
   setIsLoading(false)
 }
@@ -47,9 +48,10 @@ function clock(mode: "in" | "out", authHeader: () => string) {
 }
 
 export default function HomePage() {
-  const authHeader = useAuthHeader();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const signOut = useSignOut()
+  const authHeader = useAuthHeader()
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
   const [status, setStatus] = useState({
     name: "",
     isClockedIn: false,
@@ -66,8 +68,13 @@ export default function HomePage() {
 
   useMemo(() => wrapper(() => getStatus(authHeader), setError, setIsLoading, setStatus), [])
 
+  if (axios.isAxiosError(error) && error.response?.status == 401) {
+    signOut()
+    return <Navigate to="login" />
+  }
+
   return <>
-    {error && <h3>Error: {error}</h3>}
+    {error && <h3>Error: {error.message}</h3>}
     <div className={styles.mainArea}>
       <h1>Welcome back {status.name}</h1>
       <h5>{isLoading ? "Loading..." : status.isClockedIn ? "You clocked in at " + status.clockInTime.toLocaleTimeString() : "You are not currently clocked in"}</h5>

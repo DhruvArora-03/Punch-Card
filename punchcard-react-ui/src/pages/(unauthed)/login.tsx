@@ -7,7 +7,7 @@ import styles from './login.module.css';
 import Button from 'components/Button';
 
 export default function LoginPage() {
-  const [error, setError] = useState("");
+  const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const signIn = useSignIn();
   const encoder = new TextEncoder();
@@ -22,8 +22,7 @@ export default function LoginPage() {
   };
 
   const onSubmit = async (values: any) => {
-    console.log("Values: ", values)
-    setError("")
+    setError(null)
     setIsLoading(true)
 
     await hashPassword(values.password)
@@ -41,12 +40,8 @@ export default function LoginPage() {
         authState: { username: values.username },
       }))
       .catch((err) => {
-        if (err instanceof AxiosError) {
-          setError(err.response?.data.message)
-        } else if (err instanceof Error) {
-          setError(err.message)
-        }
-        console.log("Error: ", err);
+        setError(err)
+        console.log("Error Message: ", err.message);
       })
       .then(() => setIsLoading(false))
   };
