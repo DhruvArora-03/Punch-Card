@@ -39,8 +39,8 @@ CREATE TABLE shifts (
     paycheck_id BIGINT UNSIGNED NULL,
     clock_in DATETIME NOT NULL,
     clock_out DATETIME NULL,
-    user_notes TEXT NULL,
-    admin_notes TEXT NULL,
+    user_notes TINYTEXT NULL,
+    admin_notes TINYTEXT NULL,
     createdBy BIGINT UNSIGNED NOT NULL,
     createdAt DATETIME NOT NULL,
     updatedBy BIGINT UNSIGNED NOT NULL,
@@ -150,12 +150,14 @@ END;
 DROP PROCEDURE IF EXISTS ClockOut;
 CREATE PROCEDURE ClockOut (
     IN in_user_id BIGINT UNSIGNED,
-    IN in_clock_out DATETIME
+    IN in_clock_out DATETIME,
+    IN in_notes TINYTEXT
 )
 BEGIN
     UPDATE shifts
     SET
         clock_out = in_clock_out,
+        user_notes = in_notes,
         updatedBy = in_user_id,
         updatedAt = UTC_TIMESTAMP()
     WHERE
