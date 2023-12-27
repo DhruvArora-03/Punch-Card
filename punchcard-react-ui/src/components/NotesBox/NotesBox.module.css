@@ -1,0 +1,23 @@
+.notesBox {
+  width: 100%;
+  border-radius: 10px;
+  position: relative;
+}
+
+.textArea {
+  background-color: whitesmoke;
+  border-radius: 10px;
+  width: 100%;
+  padding: 10px;
+  resize: none;
+  height: 20;
+}
+
+.spinner {
+  position: absolute;
+  margin: auto;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}

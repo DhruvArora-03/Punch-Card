@@ -61,6 +61,7 @@ export default function LoginPage() {
         <InputGroup.Text> Username: </InputGroup.Text>
         <Form.Control
           id="username"
+          autoComplete="on"
           onChange={formik.handleChange}
           value={formik.values.username}
         />
@@ -70,6 +71,7 @@ export default function LoginPage() {
         <Form.Control
           id="password"
           type="password"
+          autoComplete="on"
           onChange={formik.handleChange}
           value={formik.values.password}
         />

@@ -1,11 +1,12 @@
 import axios, { AxiosResponse } from "axios";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuthHeader, useSignOut } from "react-auth-kit"
 import styles from './home.module.css';
 import Button from "components/Button"
 import { Navigate } from "react-router";
+import NotesBox from "components/NotesBox";
+import { setStateType } from "utils";
 
-type setStateType<T> = React.Dispatch<React.SetStateAction<T>>
 type setStatusType = setStateType<{
   name: string;
   isClockedIn: boolean;
@@ -26,7 +27,8 @@ async function wrapper(callback: () => Promise<any>,
         name: response.data.name,
         isClockedIn: response.data.is_clocked_in,
         clockInTime: new Date(response.data.clock_in_time)
-      }))
+      })
+    )
     .catch((err) => {
       setError(err)
       !(axios.isAxiosError(err) && err.response?.status == 401) && console.log(err)
@@ -50,6 +52,7 @@ function clock(mode: "in" | "out", authHeader: () => string) {
 export default function HomePage() {
   const signOut = useSignOut()
   const authHeader = useAuthHeader()
+  const [notes, setNotes] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   const [status, setStatus] = useState({
@@ -57,6 +60,7 @@ export default function HomePage() {
     isClockedIn: false,
     clockInTime: new Date(0)
   });
+
   const clockInProps = {
     text: "Clock In",
     onClick: () => wrapper(() => clock("in", authHeader), setError, setIsLoading, setStatus)
@@ -68,17 +72,39 @@ export default function HomePage() {
 
   useMemo(() => wrapper(() => getStatus(authHeader), setError, setIsLoading, setStatus), [])
 
-  if (axios.isAxiosError(error) && error.response?.status == 401) {
-    signOut()
-    return <Navigate to="/login" />
-  }
+  useEffect(() => {
+    console.log("USE EFFECT IS RUNNINGGGGG")
+    if (axios.isAxiosError(error) && error.response?.status == 401) {
+      console.warn("USE EFFECT FOUND ISSUE")
+      signOut()
+      // return <Navigate to="/login" />
+    }
+  })
+
 
   return <>
     {error && <h3>Error: {error.message}</h3>}
-    <div className={styles.mainArea}>
-      <h1>Welcome back {status.name}</h1>
-      <h5>{isLoading ? "Loading..." : status.isClockedIn ? "You clocked in at " + status.clockInTime.toLocaleTimeString() : "You are not currently clocked in"}</h5>
-      <Button className={styles.button} loading={isLoading} {...(status.isClockedIn ? clockOutProps : clockInProps)} />
+    <div className={styles.page}>
+      <div className={styles.mainArea}>
+        <h1 className={styles.title}>Welcome back {status.name}</h1>
+        <h2 className={styles.text}>
+          {isLoading
+            ? "Loading..."
+            : status.isClockedIn
+              ? "You clocked in at " + status.clockInTime.toLocaleTimeString([], { timeStyle: "short" })
+              : "You are not currently clocked in"}
+        </h2>
+        <NotesBox
+          disabled={isLoading || !status.isClockedIn}
+          loading={isLoading} text={notes}
+          onTextChange={setNotes}
+        />
+        <Button
+          className={styles.button}
+          loading={isLoading}
+          {...(status.isClockedIn ? clockOutProps : clockInProps)}
+        />
+      </div>
     </div>
   </>
 
