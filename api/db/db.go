@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"time"
+	"errors"
 )
 
 var db *sql.DB
@@ -74,12 +75,12 @@ func GetClockInStatus(userID string) (bool, time.Time, error) {
 		return false, time.Time{}, err
 	}
 
-	if clockInTime.Valid {
-		parsed, _ := time.Parse("2006-01-02 03:04:05", clockInTime.String)
-		return true, parsed, nil
+	if !clockInTime.Valid {
+		return false, time.Time{}, errors.New("sql procedure returned invalid")
 	}
 
-	return false, time.Time{}, nil
+	parsed, err := time.Parse("2006-01-02 15:04:05", clockInTime.String)
+	return true, parsed, err
 }
 
 func ClockIn(userID string, clockInTime time.Time) (error) {
