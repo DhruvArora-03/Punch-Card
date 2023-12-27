@@ -115,7 +115,7 @@ func ClockOutHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("%s ~/clock-out\n\n", r.Method)
 	time.Sleep(2 * time.Second)
 
-	if r.Method != http.MethodPost {
+	if r.Method != http.MethodPost && r.Method != http.MethodPut {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
@@ -123,6 +123,7 @@ func ClockOutHandler(w http.ResponseWriter, r *http.Request) {
 	// the expected request body
 	var request struct {
 		Time time.Time `json:time`
+		Notes string `json:string`
 	}
 
 	// check if body matches
@@ -139,11 +140,18 @@ func ClockOutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = db.ClockOut(userID, request.Time)
-	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "Clock out request failed, try again later", http.StatusInternalServerError)
-		return
+	if r.Method == http.MethodPost {
+		err = db.ClockOut(userID, request.Time, request.Notes)
+		if err != nil {
+			http.Error(w, "Clock out request failed, try again later", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		err = db.UpdateNotes(userID, request.Notes)
+		if err != nil {
+			http.Error(w, "Update notes request failed, try again later", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	firstName, err := db.GetFirstName(userID)
@@ -156,7 +164,7 @@ func ClockOutHandler(w http.ResponseWriter, r *http.Request) {
 	// Respond with a JSON object
 	response := responseType{
 		Name: firstName,
-		IsClockedIn: false,
+		IsClockedIn: r.Method == http.MethodPost,
 		ClockInTime: time.Time{},
 	}
 

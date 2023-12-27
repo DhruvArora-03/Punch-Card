@@ -88,7 +88,7 @@ func setupRoutes() (*mux.Router) {
 	r.HandleFunc("/protected", auth.ValidateToken(ProtectedHandler)).Methods("GET")
 	r.HandleFunc("/status", auth.ValidateToken(shifts.GetStatusHandler)).Methods("GET")
 	r.HandleFunc("/clock-in", auth.ValidateToken(shifts.ClockInHandler)).Methods("POST")
-	r.HandleFunc("/clock-out", auth.ValidateToken(shifts.ClockOutHandler)).Methods("POST")
+	r.HandleFunc("/clock-out", auth.ValidateToken(shifts.ClockOutHandler)).Methods("POST", "PUT")
 
 	return r
 }

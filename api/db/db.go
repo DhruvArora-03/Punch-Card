@@ -88,7 +88,12 @@ func ClockIn(userID string, clockInTime time.Time) (error) {
 	return err
 }
 
-func ClockOut(userID string, clockInTime time.Time) (error) {
-	_, err := db.Exec("CALL ClockOut(?, ?)", userID, clockInTime)
+func ClockOut(userID string, clockInTime time.Time, notes string) (error) {
+	_, err := db.Exec("CALL ClockOut(?, ?, ?)", userID, clockInTime, notes)
+	return err
+}
+
+func UpdateNotes(userID string, notes string) (error) {
+	_, err := db.Exec("CALL UpdateNotes(?, ?)", userID, notes)
 	return err
 }
