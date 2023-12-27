@@ -191,6 +191,22 @@ BEGIN
         clock_out IS NULL; -- Only update if the shift has not been clocked out before
 END;
 
+DROP PROCEDURE IF EXISTS UpdateNotes;
+CREATE PROCEDURE UpdateNotes (
+    IN in_user_id BIGINT UNSIGNED,
+    IN in_notes TINYTEXT
+)
+BEGIN
+    UPDATE shifts
+    SET
+        user_notes = in_notes,
+        updatedBy = in_user_id,
+        updatedAt = UTC_TIMESTAMP()
+    WHERE
+        user_id = in_user_id AND
+        clock_out IS NULL;
+END;
+
 -- @block
 SELECT * from users
 
