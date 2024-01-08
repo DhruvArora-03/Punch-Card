@@ -24,7 +24,6 @@ var users = map[string]string{
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now())
 	fmt.Printf("%s ~/login\n\n", r.Method)
-	time.Sleep(2 * time.Second)
 	
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -76,7 +75,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now())
 	fmt.Printf("%s ~/protected\n\n", r.Method)
-	time.Sleep(time.Second)
 	fmt.Fprintf(w, "This is a protected route.")
 }
 

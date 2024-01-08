@@ -24,7 +24,6 @@ type clockResponseType struct {
 func GetStatusHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now())
 	fmt.Printf("%s ~/status\n\n", r.Method)
-	time.Sleep(2 * time.Second)
 	
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -67,7 +66,6 @@ func GetStatusHandler(w http.ResponseWriter, r *http.Request) {
 func ClockInHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now())
 	fmt.Printf("%s ~/clock-in\n\n", r.Method)
-	time.Sleep(2 * time.Second)
 	
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -113,7 +111,6 @@ func ClockInHandler(w http.ResponseWriter, r *http.Request) {
 func ClockOutHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now())
 	fmt.Printf("%s ~/clock-out\n\n", r.Method)
-	time.Sleep(2 * time.Second)
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -160,7 +157,6 @@ func ClockOutHandler(w http.ResponseWriter, r *http.Request) {
 func SaveNotesHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now())
 	fmt.Printf("%s ~/clock-notes\n\n", r.Method)
-	time.Sleep(2 * time.Second)
 
 	if r.Method != http.MethodPut {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

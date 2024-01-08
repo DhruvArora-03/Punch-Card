@@ -22,11 +22,11 @@ export function formatClockedInMessage(date: Date) {
   const currentDate = new Date();
 
   if (isToday(date)) {
-    return `You clocked in at ${format(date, 'HH:mm')} today`;
+    return `You clocked in at ${format(date, 'h:mm a')} today.`;
   } else if (isYesterday(date)) {
-    return `You clocked in at ${format(date, 'HH:mm')} yesterday`;
+    return `You clocked in at ${format(date, 'h:mm a')} yesterday.`;
   } else {
     const daysDifference = Math.floor((currentDate.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-    return `You clocked in at ${format(date, 'HH:mm')} ${daysDifference} days ago`;
+    return `You clocked in at ${format(date, 'h:mm a')} ${daysDifference} days ago.`;
   }
 }
