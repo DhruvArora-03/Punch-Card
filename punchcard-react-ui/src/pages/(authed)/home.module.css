@@ -1,4 +1,5 @@
 .page {
+  background-color: rgb(233, 244, 248);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,14 +15,19 @@
   width: 400px;
 }
 
-.mainArea .title {
+.title {
   font-size: 40px;
 }
 
-.mainArea .text {
+.text {
   font-size: 20px;
 }
 
-.mainArea .button {
+.mainButton {
   width: 100%;
+}
+
+.notesButton {
+  width: 50%;
+  align-self: flex-end;
 }

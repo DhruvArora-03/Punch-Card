@@ -2,8 +2,8 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
-	"errors"
 )
 
 var db *sql.DB
@@ -62,25 +62,34 @@ func GetFirstName(userID string) (string, error) {
 	return firstName.String, nil
 }
 
-func GetClockInStatus(userID string) (bool, time.Time, error) {
-	_, err := db.Exec("CALL GetClockInStatus(?, @clock_in_time)", userID)
+func parseNotes(notes sql.NullString) (string) {
+	if notes.Valid {
+		return notes.String
+	}
+
+	return ""
+}
+
+func GetClockInStatus(userID string) (bool, time.Time, string, error) {
+	_, err := db.Exec("CALL GetClockInStatus(?, @clock_in_time, @notes)", userID)
 	if err != nil {
-		return false, time.Time{}, err
+		return false, time.Time{}, "", err
 	}
 
 	// Retrieve output
-	var clockInTime sql.NullString
-	err = db.QueryRow("SELECT @clock_in_time").Scan(&clockInTime)
+	var clockInTime, notes sql.NullString
+	err = db.QueryRow("SELECT @clock_in_time, @notes").Scan(&clockInTime, &notes)
 	if err != nil {
-		return false, time.Time{}, err
+		return false, time.Time{}, "", err
 	}
 
-	if !clockInTime.Valid {
-		return false, time.Time{}, errors.New("sql procedure returned invalid")
+	// check if clocked in
+	if !clockInTime.Valid && !notes.Valid {
+		return false, time.Time{}, "", nil
 	}
 
 	parsed, err := time.Parse("2006-01-02 15:04:05", clockInTime.String)
-	return true, parsed, err
+	return true, parsed, parseNotes(notes), err
 }
 
 func ClockIn(userID string, clockInTime time.Time) (error) {
@@ -94,6 +103,7 @@ func ClockOut(userID string, clockInTime time.Time, notes string) (error) {
 }
 
 func UpdateNotes(userID string, notes string) (error) {
+	fmt.Printf("CALL UpdateNotes(%s, %s)\n", userID, notes)
 	_, err := db.Exec("CALL UpdateNotes(?, ?)", userID, notes)
 	return err
 }

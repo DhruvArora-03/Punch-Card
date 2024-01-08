@@ -3,74 +3,78 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuthHeader, useSignOut } from "react-auth-kit"
 import styles from './home.module.css';
 import Button from "components/Button"
-import { Navigate } from "react-router";
 import NotesBox from "components/NotesBox";
-import { setStateType } from "utils";
+import { apiWrapper, setStateType } from "lib";
 
 type setStatusType = setStateType<{
   name: string;
-  isClockedIn: boolean;
-  clockInTime: Date;
+  is_clocked_in: boolean;
+  clock_in_time: string;
 }>
 
-
-async function wrapper(callback: () => Promise<any>,
-  setError: setStateType<Error | null>,
-  setIsLoading: setStateType<boolean>,
-  setStatus: setStatusType
-) {
-  setIsLoading(true)
-  setError(null)
-  await callback()
-    .then((response: AxiosResponse) =>
-      setStatus({
-        name: response.data.name,
-        isClockedIn: response.data.is_clocked_in,
-        clockInTime: new Date(response.data.clock_in_time)
-      })
-    )
-    .catch((err) => {
-      setError(err)
-      !(axios.isAxiosError(err) && err.response?.status == 401) && console.log(err)
-    })
-  setIsLoading(false)
-}
-
-function getStatus(authHeader: () => string) {
+function getStatus(authHeader: () => string, setStatus: setStatusType) {
   return axios.get("http://localhost:8080/status",
     { headers: { Authorization: authHeader() } } // request config
-  )
+  ).then((response: AxiosResponse) => {
+    const { notes, ...data } = response.data;
+    setStatus(data)
+    return notes
+  })
 }
 
-function clock(mode: "in" | "out", authHeader: () => string) {
-  return axios.post("http://localhost:8080/clock-" + mode,
+function clockIn(authHeader: () => string) {
+  return axios.post("http://localhost:8080/clock-in",
     { time: new Date().toJSON() }, // request body
+    { headers: { Authorization: authHeader() } } // request config
+  ).then((response: AxiosResponse) => {
+    return response.data
+  })
+}
+
+function saveNotes(authHeader: () => string, notes: string) {
+  return axios.put("http://localhost:8080/clock-notes",
+    { notes }, // request body
     { headers: { Authorization: authHeader() } } // request config
   )
 }
+
+function clockOut(authHeader: () => string, notes: string) {
+  return axios.post("http://localhost:8080/clock-out",
+    {
+      // request body
+      time: new Date().toJSON(),
+      notes
+    },
+    { headers: { Authorization: authHeader() } } // request config
+  ).then((response: AxiosResponse) => {
+    return response.data
+  })
+}
+
 
 export default function HomePage() {
   const signOut = useSignOut()
   const authHeader = useAuthHeader()
+  const [oldNotes, setOldNotes] = useState("")
   const [notes, setNotes] = useState("")
+  const [isNotesLoading, setIsNotesLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   const [status, setStatus] = useState({
     name: "",
-    isClockedIn: false,
-    clockInTime: new Date(0)
+    is_clocked_in: false,
+    clock_in_time: ""
   });
 
-  const clockInProps = {
-    text: "Clock In",
-    onClick: () => wrapper(() => clock("in", authHeader), setError, setIsLoading, setStatus)
-  }
-  const clockOutProps = {
-    text: "Clock Out",
-    onClick: () => wrapper(() => clock("out", authHeader), setError, setIsLoading, setStatus)
-  }
-
-  useMemo(() => wrapper(() => getStatus(authHeader), setError, setIsLoading, setStatus), [])
+  useMemo(() =>
+    apiWrapper(
+      () => getStatus(authHeader, setStatus).then((notes: string) => {
+        setNotes(notes)
+        setOldNotes(notes)
+      }),
+      setError,
+      setIsLoading
+    ), [])
 
   useEffect(() => {
     console.log("USE EFFECT IS RUNNINGGGGG")
@@ -79,7 +83,7 @@ export default function HomePage() {
       signOut()
       // return <Navigate to="/login" />
     }
-  })
+  }, [error])
 
 
   return <>
@@ -90,20 +94,81 @@ export default function HomePage() {
         <h2 className={styles.text}>
           {isLoading
             ? "Loading..."
-            : status.isClockedIn
-              ? "You clocked in at " + status.clockInTime.toLocaleTimeString([], { timeStyle: "short" })
+            : status.is_clocked_in
+              ? "You clocked in at " + new Date(status.clock_in_time).toLocaleTimeString([], { timeStyle: "short" })
               : "You are not currently clocked in"}
         </h2>
-        <NotesBox
-          disabled={isLoading || !status.isClockedIn}
-          loading={isLoading} text={notes}
-          onTextChange={setNotes}
-        />
-        <Button
-          className={styles.button}
-          loading={isLoading}
-          {...(status.isClockedIn ? clockOutProps : clockInProps)}
-        />
+
+        {!status.is_clocked_in
+          ? <Button
+            className={styles.mainButton}
+            loading={isLoading}
+            text="Clock In"
+            color="green"
+            onClick={() =>
+              apiWrapper(
+                () => clockIn(authHeader)
+                  .then((data: { is_clocked_in: boolean, clock_in_time: string }) => {
+                    setStatus({
+                      ...data,
+                      name: status.name
+                    })
+                    setNotes("")
+                    setOldNotes("")
+                  }),
+                setError,
+                setIsLoading
+              )
+            }
+          />
+          : <>
+            <NotesBox
+              disabled={isLoading || isNotesLoading}
+              text={notes}
+              onTextChange={setNotes}
+            />
+            <Button
+              className={styles.notesButton}
+              loading={isNotesLoading}
+              disabled={isLoading || notes == oldNotes}
+              text="Save Notes"
+              color="yellow"
+              onClick={() =>
+                apiWrapper(
+                  () => saveNotes(authHeader, notes).then(() => setOldNotes(notes)),
+                  setError,
+                  setIsNotesLoading
+                )
+              }
+            />
+            <Button
+              className={styles.mainButton}
+              loading={status.is_clocked_in && isLoading}
+              disabled={!status.is_clocked_in || isLoading || isNotesLoading}
+              text={(notes == oldNotes ? "" : "Save Notes and ") + "Clock Out"}
+              color="green"
+              onClick={() =>
+                apiWrapper(
+                  () => clockOut(
+                    authHeader,
+                    notes
+                  ).then(
+                    (data: { is_clocked_in: boolean, clock_in_time: string }) => {
+                      setStatus({
+                        ...data,
+                        name: status.name
+                      })
+                      setNotes("")
+                      setOldNotes("")
+                    }
+                  ),
+                  setError,
+                  setIsLoading
+                )
+              }
+            />
+          </>
+        }
       </div>
     </div>
   </>

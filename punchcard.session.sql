@@ -131,11 +131,13 @@ END;
 DROP PROCEDURE IF EXISTS GetClockInStatus;
 CREATE PROCEDURE GetClockInStatus (
     IN in_user_id BIGINT UNSIGNED,
-    OUT clock_in_time_result DATETIME
+    OUT is_clocked_in
+    OUT clock_in_time_result DATETIME,
+    OUT notes_result TINYTEXT
 )
 BEGIN
-    SELECT clock_in
-    INTO clock_in_time_result
+    SELECT clock_in, user_notes
+    INTO clock_in_time_result, notes_result
     FROM shifts
     WHERE 
         user_id = in_user_id AND
