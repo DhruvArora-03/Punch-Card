@@ -4,7 +4,7 @@ import { useAuthHeader, useSignOut } from "react-auth-kit"
 import styles from './home.module.css';
 import Button from "components/Button"
 import NotesBox from "components/NotesBox";
-import { apiWrapper } from "lib";
+import { apiWrapper, formatClockedInMessage } from "lib";
 
 function getStatus(authHeader: () => string) {
   return axios.get("http://localhost:8080/status",
@@ -92,7 +92,7 @@ export default function HomePage() {
           {isLoading
             ? "Loading..."
             : status.is_clocked_in
-              ? "You clocked in at " + new Date(status.clock_in_time).toLocaleTimeString([], { timeStyle: "short" })
+              ? formatClockedInMessage(new Date(status.clock_in_time))
               : "You are not currently clocked in"}
         </h2>
 

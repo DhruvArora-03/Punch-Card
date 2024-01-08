@@ -1,4 +1,5 @@
-import axios from "axios"
+import axios from "axios";
+import { format, isToday, isYesterday } from "date-fns";
 
 export type setStateType<T> = React.Dispatch<React.SetStateAction<T>>
 
@@ -14,4 +15,18 @@ export async function apiWrapper(callback: () => Promise<void>,
       !(axios.isAxiosError(err) && err.response?.status == 401) && console.log(err)
     })
   setIsLoading(false)
+}
+
+
+export function formatClockedInMessage(date: Date) {
+  const currentDate = new Date();
+
+  if (isToday(date)) {
+    return `You clocked in at ${format(date, 'HH:mm')} today`;
+  } else if (isYesterday(date)) {
+    return `You clocked in at ${format(date, 'HH:mm')} yesterday`;
+  } else {
+    const daysDifference = Math.floor((currentDate.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    return `You clocked in at ${format(date, 'HH:mm')} ${daysDifference} days ago`;
+  }
 }
