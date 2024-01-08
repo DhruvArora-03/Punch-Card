@@ -4,38 +4,26 @@ import { useAuthHeader, useSignOut } from "react-auth-kit"
 import styles from './home.module.css';
 import Button from "components/Button"
 import NotesBox from "components/NotesBox";
-import { apiWrapper, setStateType } from "lib";
+import { apiWrapper } from "lib";
 
-type setStatusType = setStateType<{
-  name: string;
-  is_clocked_in: boolean;
-  clock_in_time: string;
-}>
-
-function getStatus(authHeader: () => string, setStatus: setStatusType) {
+function getStatus(authHeader: () => string) {
   return axios.get("http://localhost:8080/status",
     { headers: { Authorization: authHeader() } } // request config
-  ).then((response: AxiosResponse) => {
-    const { notes, ...data } = response.data;
-    setStatus(data)
-    return notes
-  })
+  ).then((response: AxiosResponse) => response.data)
 }
 
 function clockIn(authHeader: () => string) {
   return axios.post("http://localhost:8080/clock-in",
     { time: new Date().toJSON() }, // request body
     { headers: { Authorization: authHeader() } } // request config
-  ).then((response: AxiosResponse) => {
-    return response.data
-  })
+  ).then((response: AxiosResponse) => response.data)
 }
 
 function saveNotes(authHeader: () => string, notes: string) {
   return axios.put("http://localhost:8080/clock-notes",
     { notes }, // request body
     { headers: { Authorization: authHeader() } } // request config
-  )
+  ).then((response: AxiosResponse) => response.data)
 }
 
 function clockOut(authHeader: () => string, notes: string) {
@@ -46,9 +34,7 @@ function clockOut(authHeader: () => string, notes: string) {
       notes
     },
     { headers: { Authorization: authHeader() } } // request config
-  ).then((response: AxiosResponse) => {
-    return response.data
-  })
+  ).then((response: AxiosResponse) => response.data)
 }
 
 
@@ -68,10 +54,21 @@ export default function HomePage() {
 
   useMemo(() =>
     apiWrapper(
-      () => getStatus(authHeader, setStatus).then((notes: string) => {
-        setNotes(notes)
-        setOldNotes(notes)
-      }),
+      () => getStatus(authHeader)
+        .then((d: {
+          notes: string;
+          name: string;
+          is_clocked_in: boolean;
+          clock_in_time: string;
+        }) => {
+          const { notes, ...data } = d;
+          setStatus(data)
+          return notes
+        })
+        .then((notes: string) => {
+          setNotes(notes)
+          setOldNotes(notes)
+        }),
       setError,
       setIsLoading
     ), [])
@@ -132,7 +129,7 @@ export default function HomePage() {
               loading={isNotesLoading}
               disabled={isLoading || notes == oldNotes}
               text="Save Notes"
-              color="yellow"
+              color="blue"
               onClick={() =>
                 apiWrapper(
                   () => saveNotes(authHeader, notes).then(() => setOldNotes(notes)),

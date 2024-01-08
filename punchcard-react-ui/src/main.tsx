@@ -3,6 +3,7 @@ import { Routes } from '@generouted/react-router'
 import React from 'react'
 import { AuthProvider } from 'react-auth-kit';
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./colors.css"
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

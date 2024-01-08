@@ -1,5 +1,7 @@
 .page {
-  background-color: rgb(233, 244, 248);
+  /* background-color: rgb(233, 244, 248); */
+  /* background-color: rgb(248, 249, 203); */
+  background-color: var(--background-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7,12 +9,18 @@
 }
 
 .mainArea {
+  /* background-color: var(--main-color);
+  padding: 50px;
+  border: 2px solid black;
+  box-shadow: 14px 14px 14px 0px rgba(0, 0, 0, 0.25);
+  border-radius: 10px; */
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 20px;
-  width: 400px;
+  /* width: 400px; */
 }
 
 .title {
