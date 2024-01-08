@@ -8,6 +8,6 @@ export default function Layout() {
     <NavBar />
     <RequireAuth loginPath="/login">
       <Outlet />
-    </RequireAuth>;
+    </RequireAuth>
   </>
 }
