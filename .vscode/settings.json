@@ -11,7 +11,8 @@
       "driver": "MySQL",
       "name": "punchcard",
       "database": "punchcard",
-      "username": "root"
+      "username": "admin",
+      "password": "admin"
     }
   ]
 }
