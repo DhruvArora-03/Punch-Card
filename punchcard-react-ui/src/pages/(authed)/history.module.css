@@ -10,16 +10,23 @@ h1 {
 
 .form {
   display: flex;
-  gap: 20px;
+  flex-direction: column;
+  margin: 10px 0;
+  /* width: fit-content; */
+  /* justify-content: flex-start; */
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.form > div {
+  display: flex;
+  gap: 10px;
+}
+
+.form > div > * {
   width: fit-content;
-  margin: 15px 0;
 }
 
-.form > * {
-  flex-basis: 100%;
-  width: 200px;
-}
-
-.button {
-  height: fit-content;
-}
+/* .button {
+  margin-bottom: 10px;
+} */

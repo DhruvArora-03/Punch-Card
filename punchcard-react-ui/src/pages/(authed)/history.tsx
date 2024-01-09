@@ -1,6 +1,6 @@
 import { useFormik } from "Formik";
 import { useState } from "react";
-import { Form, FloatingLabel, Table } from "react-bootstrap";
+import { Form, InputGroup, Table } from "react-bootstrap";
 import styles from "./history.module.css";
 import Button from "components/Button";
 
@@ -27,43 +27,47 @@ export default function HistoryPage() {
   return (
     <>
       <div className={styles.page}>
-        <h1>View Shifts</h1>
+        <h1>Shift History</h1>
         <Form className={styles.form} onSubmit={formik.handleSubmit}>
-          <FloatingLabel label="Month">
-            <Form.Select
-              className={styles.select}
-              id="month"
-              onChange={formik.handleChange}
-              value={formik.values.month}
-            >
-              <option value={0}>All Months</option>
-              <option value={1}>January</option>
-              <option value={2}>February</option>
-              <option value={3}>March</option>
-              <option value={4}>April</option>
-              <option value={5}>May</option>
-              <option value={6}>June</option>
-              <option value={7}>July</option>
-              <option value={8}>August</option>
-              <option value={9}>September</option>
-              <option value={10}>October</option>
-              <option value={11}>November</option>
-              <option value={12}>December</option>
-            </Form.Select>
-          </FloatingLabel>
-          <FloatingLabel label="Year">
-            <Form.Select
-              id="year"
-              onChange={formik.handleChange}
-              value={formik.values.year}
-            >
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </Form.Select>
-          </FloatingLabel>
+          <div>
+            <InputGroup>
+              <InputGroup.Text> Month: </InputGroup.Text>
+              <Form.Select
+                className={styles.select}
+                id="month"
+                onChange={formik.handleChange}
+                value={formik.values.month}
+              >
+                <option value={0}>All Months</option>
+                <option value={1}>January</option>
+                <option value={2}>February</option>
+                <option value={3}>March</option>
+                <option value={4}>April</option>
+                <option value={5}>May</option>
+                <option value={6}>June</option>
+                <option value={7}>July</option>
+                <option value={8}>August</option>
+                <option value={9}>September</option>
+                <option value={10}>October</option>
+                <option value={11}>November</option>
+                <option value={12}>December</option>
+              </Form.Select>
+            </InputGroup>
+            <InputGroup className={styles.input}>
+              <InputGroup.Text> Year: </InputGroup.Text>
+              <Form.Select
+                id="year"
+                onChange={formik.handleChange}
+                value={formik.values.year}
+              >
+                {years.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </Form.Select>
+            </InputGroup>
+          </div>
           <Button
             className={styles.button}
             type="submit"
