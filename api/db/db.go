@@ -107,3 +107,4 @@ func UpdateNotes(userID string, notes string) (error) {
 	_, err := db.Exec("CALL UpdateNotes(?, ?)", userID, notes)
 	return err
 }
+

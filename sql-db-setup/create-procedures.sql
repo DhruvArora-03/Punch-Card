@@ -138,3 +138,15 @@ SET user_notes = in_notes,
 WHERE user_id = in_user_id
     AND clock_out IS NULL;
 END;
+DROP PROCEDURE IF EXISTS GetShiftHistory;
+CREATE PROCEDURE GetShiftHistory(
+    IN in_user_id BIGINT UNSIGNED,
+    IN lower_bound DATETIME,
+    IN upper_bound DATETIME
+) BEGIN
+SELECT *
+FROM shifts
+WHERE user_id = in_user_id
+    AND clock_in >= lower_bound
+    AND clock_out <= upper_bound;
+END;
