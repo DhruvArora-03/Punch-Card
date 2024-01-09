@@ -10,21 +10,21 @@ import (
 )
 
 type statusResponseType struct {
-	Name string `json:"name"`
-	IsClockedIn bool   `json:"is_clocked_in"`
+	Name        string    `json:"name"`
+	IsClockedIn bool      `json:"is_clocked_in"`
 	ClockInTime time.Time `json:"clock_in_time"`
-	Notes string `json:"notes"`
+	Notes       string    `json:"notes"`
 }
 
 type clockResponseType struct {
-	IsClockedIn bool   `json:"is_clocked_in"`
+	IsClockedIn bool      `json:"is_clocked_in"`
 	ClockInTime time.Time `json:"clock_in_time"`
 }
 
 func GetStatusHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now())
 	fmt.Printf("%s ~/status\n\n", r.Method)
-	
+
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -36,7 +36,7 @@ func GetStatusHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	isClockedIn, clockInTime, notes, err :=  db.GetClockInStatus(userID)
+	isClockedIn, clockInTime, notes, err := db.GetClockInStatus(userID)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Couldn't retrieve current user status", http.StatusInternalServerError)
@@ -52,10 +52,10 @@ func GetStatusHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Respond with a JSON object
 	response := statusResponseType{
-		Name: firstName,
+		Name:        firstName,
 		IsClockedIn: isClockedIn,
 		ClockInTime: clockInTime,
-		Notes: notes,
+		Notes:       notes,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -66,7 +66,7 @@ func GetStatusHandler(w http.ResponseWriter, r *http.Request) {
 func ClockInHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now())
 	fmt.Printf("%s ~/clock-in\n\n", r.Method)
-	
+
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -76,15 +76,15 @@ func ClockInHandler(w http.ResponseWriter, r *http.Request) {
 	var request struct {
 		Time time.Time `json:"time"`
 	}
-	
+
 	// check if body matches
-	err := json.NewDecoder(r.Body).Decode(&request);
+	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	
-	var userID string
+
+	var userID uint64
 	userID, err = auth.ExtractUserID(r)
 	if err != nil {
 		http.Error(w, "ExtractUserID failed despite successful ValidateToken", http.StatusInternalServerError)
@@ -119,18 +119,18 @@ func ClockOutHandler(w http.ResponseWriter, r *http.Request) {
 
 	// the expected request body
 	var request struct {
-		Time time.Time `json:"time"`
-		Notes string `json:"notes"`
+		Time  time.Time `json:"time"`
+		Notes string    `json:"notes"`
 	}
 
 	// check if body matches
-	err := json.NewDecoder(r.Body).Decode(&request);
+	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	var userID string
+	var userID uint64
 	userID, err = auth.ExtractUserID(r)
 	if err != nil {
 		http.Error(w, "ExtractUserID failed despite successful ValidateToken", http.StatusInternalServerError)
@@ -169,13 +169,13 @@ func SaveNotesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check if body matches
-	err := json.NewDecoder(r.Body).Decode(&request);
+	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	var userID string
+	var userID uint64
 	userID, err = auth.ExtractUserID(r)
 	if err != nil {
 		http.Error(w, "ExtractUserID failed despite successful ValidateToken", http.StatusInternalServerError)
@@ -192,4 +192,3 @@ func SaveNotesHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Saved!"))
 }
-

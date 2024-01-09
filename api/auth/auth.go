@@ -16,7 +16,7 @@ var secretKey = []byte("change-this-to-an-actual-secret-key-later-because-this-i
 
 // Claims represents the structure of JWT claims.
 type claims struct {
-	UserID string
+	UserID uint64
 	jwt.StandardClaims
 }
 
@@ -60,7 +60,7 @@ func CheckPassword(actualHash string, password string, salt string) (bool, error
 
 // input: userID
 // output: tokenString
-func GenerateJWT(userID string) (string, error) {
+func GenerateJWT(userID uint64) (string, error) {
 	expirationTime := time.Now().Add(5 * time.Minute)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims{
@@ -98,10 +98,10 @@ func extractToken(r *http.Request) (*jwt.Token, error) {
 	return token, nil
 }
 
-func ExtractUserID(r *http.Request) (string, error) {
+func ExtractUserID(r *http.Request) (uint64, error) {
 	token, err := extractToken(r)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
 	// Check that the token matches the expected format
@@ -111,7 +111,7 @@ func ExtractUserID(r *http.Request) (string, error) {
 		return claims.UserID, nil
 	}
 
-	return "", errors.New("Invalid authorization token")
+	return 0, errors.New("Invalid authorization token")
 }
 
 
