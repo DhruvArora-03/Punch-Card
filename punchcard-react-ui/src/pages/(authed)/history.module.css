@@ -1,0 +1,25 @@
+.page {
+  background-color: var(--background-color);
+  height: 100%;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 15px;
+}
+
+.form {
+  display: flex;
+  gap: 20px;
+  width: fit-content;
+  margin: 15px 0;
+}
+
+.form > * {
+  flex-basis: 100%;
+  width: 200px;
+}
+
+.button {
+  height: fit-content;
+}
