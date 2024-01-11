@@ -13,6 +13,19 @@
       "database": "punchcard",
       "username": "admin",
       "password": "admin"
+    },
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 3306,
+      "driver": "MySQL",
+      "name": "punchcard2",
+      "database": "punchcard",
+      "username": "root"
     }
   ]
 }

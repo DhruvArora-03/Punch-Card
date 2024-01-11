@@ -6,20 +6,12 @@ import (
 	"net/http"
 	"punchcard-api/auth"
 	"punchcard-api/db"
+	"punchcard-api/types"
+	"strconv"
 	"time"
+
+	"github.com/gorilla/mux"
 )
-
-type statusResponseType struct {
-	Name        string    `json:"name"`
-	IsClockedIn bool      `json:"is_clocked_in"`
-	ClockInTime time.Time `json:"clock_in_time"`
-	Notes       string    `json:"notes"`
-}
-
-type clockResponseType struct {
-	IsClockedIn bool      `json:"is_clocked_in"`
-	ClockInTime time.Time `json:"clock_in_time"`
-}
 
 func GetStatusHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now())
@@ -51,7 +43,7 @@ func GetStatusHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Respond with a JSON object
-	response := statusResponseType{
+	response := types.StatusResponseType{
 		Name:        firstName,
 		IsClockedIn: isClockedIn,
 		ClockInTime: clockInTime,
@@ -73,9 +65,7 @@ func ClockInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// the expected request body
-	var request struct {
-		Time time.Time `json:"time"`
-	}
+	var request types.ClockInRequestType
 
 	// check if body matches
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -98,7 +88,7 @@ func ClockInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Respond with a JSON object
-	response := clockResponseType{
+	response := types.ClockResponseType{
 		IsClockedIn: true,
 		ClockInTime: request.Time,
 	}
@@ -118,10 +108,7 @@ func ClockOutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// the expected request body
-	var request struct {
-		Time  time.Time `json:"time"`
-		Notes string    `json:"notes"`
-	}
+	var request types.ClockOutRequestType
 
 	// check if body matches
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -144,7 +131,7 @@ func ClockOutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Respond with a JSON object
-	response := clockResponseType{
+	response := types.ClockResponseType{
 		IsClockedIn: false,
 		ClockInTime: time.Time{},
 	}
@@ -164,9 +151,7 @@ func SaveNotesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// the expected request body
-	var request struct {
-		Notes string `json:"notes"`
-	}
+	var request types.SaveNotesRequestType
 
 	// check if body matches
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -191,4 +176,55 @@ func SaveNotesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Saved!"))
+}
+
+func GetShiftHistoryHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(time.Now())
+	fmt.Printf("%s ~/shift-history\n\n", r.Method)
+
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var err error
+	var month, year int
+
+	// get params
+	vars := mux.Vars(r)
+
+	month, err = strconv.Atoi(vars["month"])
+	if err != nil {
+		http.Error(w, "Invalid URL month param", http.StatusBadRequest)
+	}
+
+	year, err = strconv.Atoi(vars["year"])
+	if err != nil {
+		http.Error(w, "Invalid URL year param", http.StatusBadRequest)
+	}
+
+	// the expected request body
+	var request types.ShiftHistoryRequestType
+
+	// check if body matches
+	err = json.NewDecoder(r.Body).Decode(&request)
+	if err != nil && err.Error() != "EOF" {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	var userID uint64
+	userID, err = auth.ExtractUserID(r)
+	if err != nil {
+		http.Error(w, "ExtractUserID failed despite successful ValidateToken", http.StatusInternalServerError)
+		return
+	}
+
+	var response []types.ShiftHistoryResult
+	response, err = db.GetShiftHistory(userID, month, year)
+
+	// Respond with a JSON object
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
 }

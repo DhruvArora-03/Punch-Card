@@ -1,14 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"punchcard-api/auth"
 	"punchcard-api/db"
 	"punchcard-api/shifts"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -20,74 +18,18 @@ var users = map[string]string{
 	"example": "password",
 }
 
-// LoginHandler handles user login and generates a JWT upon successful login.
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(time.Now())
-	fmt.Printf("%s ~/login\n\n", r.Method)
-	
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	// the expected request body
-	var request struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
-	
-	// check if body matches
-	err := json.NewDecoder(r.Body).Decode(&request);
-	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-
-	// Check if the username and password are valid.
-	userID, hashedPass, salt, err := db.GetUserCredentials(request.Username)
-	if err != nil {
-		http.Error(w, "database issue", http.StatusInternalServerError)
-	}
-
-	ok, err := auth.CheckPassword(hashedPass, request.Password, salt)
-	if err != nil {
-		http.Error(w, "internal issue", http.StatusInternalServerError)
-		return
-	} else if !ok {
-		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
-		return
-	}
-
-	// Generate a JWT token.
-	tokenString, err := auth.GenerateJWT(userID)
-	if err != nil {
-		http.Error(w, "Error generating token", http.StatusInternalServerError)
-		return
-	}
-
-	// Respond with just the token string.
-	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(tokenString))
-}
-
-// ProtectedHandler is a sample protected route that requires a valid JWT.
-func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(time.Now())
-	fmt.Printf("%s ~/protected\n\n", r.Method)
-	fmt.Fprintf(w, "This is a protected route.")
-}
-
-func setupRoutes() (*mux.Router) {
+func setupRoutes() *mux.Router {
 	r := mux.NewRouter()
 
-	// Define routes
-	r.HandleFunc("/login", LoginHandler).Methods("POST")
-	r.HandleFunc("/protected", auth.ValidateToken(ProtectedHandler)).Methods("GET")
+	// Define un-authed routes
+	r.HandleFunc("/login", auth.LoginHandler).Methods("POST")
+
+	// Define authed routes
 	r.HandleFunc("/status", auth.ValidateToken(shifts.GetStatusHandler)).Methods("GET")
 	r.HandleFunc("/clock-in", auth.ValidateToken(shifts.ClockInHandler)).Methods("POST")
 	r.HandleFunc("/clock-out", auth.ValidateToken(shifts.ClockOutHandler)).Methods("POST")
 	r.HandleFunc("/clock-notes", auth.ValidateToken(shifts.SaveNotesHandler)).Methods("PUT")
+	r.HandleFunc("/shift-history/{month:[0-9]+}/{year:[0-9]+}", auth.ValidateToken(shifts.GetShiftHistoryHandler)).Methods("GET")
 
 	return r
 }
@@ -113,5 +55,3 @@ func main() {
 		fmt.Println("Error:", err)
 	}
 }
-
-

@@ -3,14 +3,32 @@ import { useState } from "react";
 import { Form, InputGroup, Table } from "react-bootstrap";
 import styles from "./history.module.css";
 import Button from "components/Button";
+import axios, { AxiosResponse } from "axios";
+import { useAuthHeader } from "react-auth-kit";
+import { formatDuration } from "lib";
 
 const years = Array.from(
   { length: new Date().getFullYear() - 2016 },
   (_, index) => 2017 + index
 );
 
+const options: Intl.DateTimeFormatOptions = {
+  year: 'numeric',
+  month: 'numeric',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: true
+};
+
 export default function HistoryPage() {
-  const [data, setData] = useState([]);
+  const authHeader = useAuthHeader();
+  const [data, setData] = useState<{
+    ClockIn: Date;
+    ClockOut: Date;
+    UserNotes: string;
+    AdminNotes: string;
+  }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const formik = useFormik({
@@ -19,8 +37,22 @@ export default function HistoryPage() {
       year: "2024", //new Date().getFullYear(),
     },
     onSubmit: async (values: any) => {
-      {
-      }
+      setIsLoading(true)
+      await axios.get(`http://localhost:8080/shift-history/${values.month}/${values.year}`,
+        { headers: { Authorization: authHeader() } } // request config
+      )
+        .then((response: AxiosResponse) => response.data)
+        .then((data) => {
+          console.log(data)
+          setData(data.map((d: any) => {
+            return {
+              ...d,
+              ClockIn: new Date(d.ClockIn),
+              ClockOut: new Date(d.ClockOut)
+            }
+          }))
+        })
+      setIsLoading(false)
     },
   });
 
@@ -76,7 +108,7 @@ export default function HistoryPage() {
           />
         </Form>
 
-        <Table striped>
+        <Table striped hover bordered>
           <thead>
             <tr>
               <th>Clock In</th>
@@ -86,9 +118,17 @@ export default function HistoryPage() {
               <th>Admin Notes</th>
             </tr>
           </thead>
-          {/* <tbody>
-
-          </tbody> */}
+          <tbody>
+            {data.map((row) =>
+              <tr key={row.ClockIn.getTime()}>
+                <td>{row.ClockIn.toLocaleString('en-US', options)}</td>
+                <td>{row.ClockOut.toLocaleString('en-US', options)}</td>
+                <td>{formatDuration(row.ClockOut.getTime() - row.ClockIn.getTime())}</td>
+                <td>{row.UserNotes}</td>
+                <td>{row.AdminNotes}</td>
+              </tr>
+            )}
+          </tbody>
         </Table>
       </div>
     </>

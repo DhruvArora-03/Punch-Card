@@ -144,7 +144,7 @@ CREATE PROCEDURE GetShiftHistory(
     IN lower_bound DATETIME,
     IN upper_bound DATETIME
 ) BEGIN
-SELECT *
+SELECT clock_in, clock_out, user_notes, admin_notes
 FROM shifts
 WHERE user_id = in_user_id
     AND clock_in >= lower_bound

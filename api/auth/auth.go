@@ -3,8 +3,12 @@ package auth
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
+	"punchcard-api/db"
+	"punchcard-api/types"
 	"strings"
 	"time"
 
@@ -49,7 +53,7 @@ func HashPassword(password string, salt []byte) (string, error) {
 
 // input: actual, unhashed attempt, salt
 // output: true/false if they are same
-func CheckPassword(actualHash string, password string, salt string) (bool, error) {
+func checkPassword(actualHash string, password string, salt string) (bool, error) {
 	decoded, err := hex.DecodeString(password + salt)
 	if err != nil {
 		return false, err
@@ -60,7 +64,7 @@ func CheckPassword(actualHash string, password string, salt string) (bool, error
 
 // input: userID
 // output: tokenString
-func GenerateJWT(userID uint64) (string, error) {
+func generateJWT(userID uint64) (string, error) {
 	expirationTime := time.Now().Add(5 * time.Minute)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &claims{
@@ -71,6 +75,54 @@ func GenerateJWT(userID uint64) (string, error) {
 	})
 
 	return token.SignedString(secretKey)
+}
+
+// LoginHandler handles user login and generates a JWT upon successful login.
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(time.Now())
+	fmt.Printf("%s ~/login\n\n", r.Method)
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// the expected request body
+	var request types.LoginRequestType
+
+	// check if body matches
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	// Check if the username and password are valid.
+	userID, hashedPass, salt, err := db.GetUserCredentials(request.Username)
+	if err != nil {
+		http.Error(w, "database issue", http.StatusInternalServerError)
+	}
+
+	ok, err := checkPassword(hashedPass, request.Password, salt)
+	if err != nil {
+		http.Error(w, "internal issue", http.StatusInternalServerError)
+		return
+	} else if !ok {
+		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+		return
+	}
+
+	// Generate a JWT token.
+	tokenString, err := generateJWT(userID)
+	if err != nil {
+		http.Error(w, "Error generating token", http.StatusInternalServerError)
+		return
+	}
+
+	// Respond with just the token string.
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(tokenString))
 }
 
 func extractToken(r *http.Request) (*jwt.Token, error) {
@@ -114,7 +166,6 @@ func ExtractUserID(r *http.Request) (uint64, error) {
 	return 0, errors.New("Invalid authorization token")
 }
 
-
 // ValidateToken is a middleware function to validate JWT tokens.
 func ValidateToken(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -124,9 +175,8 @@ func ValidateToken(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-
 		// check that the token matches format
-		_, ok := token.Claims.(*claims);
+		_, ok := token.Claims.(*claims)
 		if ok && token.Valid {
 			// Token is valid, proceed to the next handler.
 			next.ServeHTTP(w, r)

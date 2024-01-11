@@ -30,3 +30,14 @@ export function formatClockedInMessage(date: Date) {
     return `You clocked in at ${format(date, 'h:mm a')} ${daysDifference} days ago.`;
   }
 }
+
+export function formatDuration(duration: number) {
+  // Calculate hours and minutes
+  const hours = Math.floor(duration / (1000 * 60 * 60));
+  const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
+
+  // Format the result
+  const formattedDuration = `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
+
+  return formattedDuration;
+}

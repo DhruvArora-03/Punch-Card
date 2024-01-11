@@ -27,6 +27,6 @@ h1 {
   width: fit-content;
 }
 
-/* .button {
-  margin-bottom: 10px;
-} */
+td {
+  width: fit-content !important;
+}
