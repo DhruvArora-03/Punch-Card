@@ -3,7 +3,7 @@ import styles from './NavBar.module.css'
 import logo from 'assets/gideon-logo.png'
 import { NavBarModes } from '.';
 import { useSignOut } from 'react-auth-kit';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode } from 'react';
 import { useLocation } from 'react-router';
 import classNames from 'classnames';
 
@@ -22,8 +22,6 @@ type NavBarItemProps = {
 export default function NavBar(props: NavBarProps) {
   const signOut = useSignOut();
   const location = useLocation();
-
-  useEffect(() => { }, [location.pathname])
 
   function Item(itemProps: NavBarItemProps) {
     return <Link
