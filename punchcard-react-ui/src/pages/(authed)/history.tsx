@@ -5,7 +5,7 @@ import styles from "./history.module.css";
 import Button from "components/Button";
 import axios, { AxiosResponse } from "axios";
 import { useAuthHeader } from "react-auth-kit";
-import { formatDuration } from "lib";
+import { formatDuration, historyRowType } from "lib";
 
 const years = Array.from(
   { length: new Date().getFullYear() - 2016 },
@@ -23,12 +23,7 @@ const options: Intl.DateTimeFormatOptions = {
 
 export default function HistoryPage() {
   const authHeader = useAuthHeader();
-  const [data, setData] = useState<{
-    ClockIn: Date;
-    ClockOut: Date;
-    UserNotes: string;
-    AdminNotes: string;
-  }[]>([]);
+  const [data, setData] = useState<historyRowType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const formik = useFormik({
@@ -45,10 +40,15 @@ export default function HistoryPage() {
         .then((data) => {
           console.log(data)
           setData(data.map((d: any) => {
+            const clock_in_time = new Date(d.ClockIn)
+            const clock_out_time = new Date(d.ClockOut)
             return {
-              ...d,
-              ClockIn: new Date(d.ClockIn),
-              ClockOut: new Date(d.ClockOut)
+              key: clock_in_time.getTime(),
+              clock_in_time: clock_in_time.toLocaleString('en-US', options),
+              clock_out_time: clock_out_time.toLocaleString('en-US', options),
+              duration: formatDuration(clock_out_time.getTime() - clock_in_time.getTime()),
+              user_notes: d.UserNotes,
+              admin_notes: d.AdminNotes
             }
           }))
         })
@@ -120,12 +120,12 @@ export default function HistoryPage() {
           </thead>
           <tbody>
             {data.map((row) =>
-              <tr key={row.ClockIn.getTime()}>
-                <td>{row.ClockIn.toLocaleString('en-US', options)}</td>
-                <td>{row.ClockOut.toLocaleString('en-US', options)}</td>
-                <td>{formatDuration(row.ClockOut.getTime() - row.ClockIn.getTime())}</td>
-                <td>{row.UserNotes}</td>
-                <td>{row.AdminNotes}</td>
+              <tr key={row.key}>
+                <td>{row.clock_in_time}</td>
+                <td>{row.clock_out_time}</td>
+                <td>{row.duration}</td>
+                <td>{row.user_notes}</td>
+                <td>{row.admin_notes}</td>
               </tr>
             )}
           </tbody>

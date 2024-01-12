@@ -2,6 +2,14 @@ import axios from "axios";
 import { format, isToday, isYesterday } from "date-fns";
 
 export type setStateType<T> = React.Dispatch<React.SetStateAction<T>>
+export type historyRowType = {
+  key: string
+  clock_in_time: string;
+  clock_out_time: string;
+  duration: number;
+  user_notes: string;
+  admin_notes: string;
+}
 
 export async function apiWrapper(callback: () => Promise<void>,
   setError: setStateType<Error | null>,
@@ -16,7 +24,6 @@ export async function apiWrapper(callback: () => Promise<void>,
     })
   setIsLoading(false)
 }
-
 
 export function formatClockedInMessage(date: Date) {
   const currentDate = new Date();
