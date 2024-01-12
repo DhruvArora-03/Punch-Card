@@ -35,16 +35,8 @@ func GetStatusHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	firstName, err := db.GetFirstName(userID)
-	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "Couldn't retrieve current user data", http.StatusInternalServerError)
-		return
-	}
-
 	// Respond with a JSON object
 	response := types.StatusResponseType{
-		Name:        firstName,
 		IsClockedIn: isClockedIn,
 		ClockInTime: clockInTime,
 		Notes:       notes,

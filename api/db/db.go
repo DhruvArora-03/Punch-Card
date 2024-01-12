@@ -29,33 +29,18 @@ func ConnectToDB() (*sql.DB, error) {
 	return db, nil
 }
 
-func GetUserCredentials(username string) (uint64, string, string, string, error) {
-	_, err := db.Exec("CALL GetUserCredentials(?, @user_id, @user_hashed_password, @user_salt, @user_role)", username)
+func GetUserCredentials(username string) (uint64, string, string, string, string, error) {
+	_, err := db.Exec("CALL GetUserCredentials(?, @user_id, @user_hashed_password, @user_salt, @user_role, @user_first_name)", username)
 
 	// Retrieve the output variables
 	var id *uint64
-	var hashPass, salt, role *string
-	err = db.QueryRow("SELECT @user_id, @user_hashed_password, @user_salt, @user_role").Scan(&id, &hashPass, &salt, &role)
-	if err != nil || id == nil || hashPass == nil || salt == nil {
-		return 0, "", "", "", err
+	var hashPass, salt, role, firstName *string
+	err = db.QueryRow("SELECT @user_id, @user_hashed_password, @user_salt, @user_role, @user_first_name").Scan(&id, &hashPass, &salt, &role, &firstName)
+	if err != nil || id == nil || hashPass == nil || salt == nil || role == nil || firstName == nil {
+		return 0, "", "", "", "", err
 	}
 
-	return *id, *hashPass, *salt, *role, nil
-}
-
-func GetFirstName(userID uint64) (string, error) {
-	_, err := db.Exec("CALL GetFirstName(?, @first_name)", userID)
-	if err != nil {
-		return "", err
-	}
-
-	var firstName *string
-	err = db.QueryRow("SELECT @first_name").Scan(&firstName)
-	if err != nil {
-		return "", err
-	}
-
-	return *firstName, nil
+	return *id, *hashPass, *salt, *role, *firstName, nil
 }
 
 func parseSqlTime(sqlTime string) (time.Time, error) {

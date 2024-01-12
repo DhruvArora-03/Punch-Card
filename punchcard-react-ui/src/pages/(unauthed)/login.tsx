@@ -45,7 +45,7 @@ export default function LoginPage() {
           tokenType: "Bearer",
           expiresIn: 300,
           authState: {
-            username: values.username,
+            first_name: response.data.first_name,
             role: response.data.role
           },
         })

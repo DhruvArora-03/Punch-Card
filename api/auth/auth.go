@@ -98,7 +98,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the username and password are valid.
-	userID, hashedPass, salt, role, err := db.GetUserCredentials(request.Username)
+	userID, hashedPass, salt, role, firstName, err := db.GetUserCredentials(request.Username)
 	if err != nil {
 		http.Error(w, "database issue", http.StatusInternalServerError)
 	}
@@ -121,8 +121,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Respond with a JSON object
 	response := types.LoginResponseType{
-		Token: token,
-		Role:  role,
+		Token:     token,
+		Role:      role,
+		FirstName: firstName,
 	}
 
 	w.Header().Set("Content-Type", "application/json")

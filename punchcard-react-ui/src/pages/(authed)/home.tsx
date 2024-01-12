@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import { useEffect, useMemo, useState } from "react";
-import { useAuthHeader, useSignOut } from "react-auth-kit"
+import { useAuthHeader, useAuthUser, useSignOut } from "react-auth-kit"
 import styles from './home.module.css';
 import Button from "components/Button"
 import NotesBox from "components/NotesBox";
@@ -41,31 +41,29 @@ function clockOut(authHeader: () => string, notes: string) {
 export default function HomePage() {
   const signOut = useSignOut()
   const authHeader = useAuthHeader()
+  const authState = useAuthUser()
   const [oldNotes, setOldNotes] = useState("")
   const [notes, setNotes] = useState("")
   const [isNotesLoading, setIsNotesLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   const [status, setStatus] = useState({
-    name: "",
     is_clocked_in: false,
     clock_in_time: ""
   });
+
+  const name = useMemo(() => authState()?.first_name ?? "", [authState])
 
   useMemo(() =>
     apiWrapper(
       () => getStatus(authHeader)
         .then((d: {
           notes: string;
-          name: string;
           is_clocked_in: boolean;
           clock_in_time: string;
         }) => {
           const { notes, ...data } = d;
           setStatus(data)
-          return notes
-        })
-        .then((notes: string) => {
           setNotes(notes)
           setOldNotes(notes)
         }),
@@ -84,7 +82,7 @@ export default function HomePage() {
     {error && <h3>Error: {error.message}</h3>}
     <div className={styles.page}>
       <div className={styles.mainArea}>
-        <h1 className={styles.title}>Welcome back {status.name}</h1>
+        <h1 className={styles.title}>Welcome back {name}</h1>
         <h2 className={styles.text}>
           {isLoading
             ? "Loading..."
@@ -103,10 +101,7 @@ export default function HomePage() {
               apiWrapper(
                 () => clockIn(authHeader)
                   .then((data: { is_clocked_in: boolean, clock_in_time: string }) => {
-                    setStatus({
-                      ...data,
-                      name: status.name
-                    })
+                    setStatus(data)
                     setNotes("")
                     setOldNotes("")
                   }),
@@ -148,10 +143,7 @@ export default function HomePage() {
                     notes
                   ).then(
                     (data: { is_clocked_in: boolean, clock_in_time: string }) => {
-                      setStatus({
-                        ...data,
-                        name: status.name
-                      })
+                      setStatus(data)
                       setNotes("")
                       setOldNotes("")
                     }

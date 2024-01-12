@@ -7,15 +7,18 @@ CREATE PROCEDURE GetUserCredentials(
     OUT user_id_result BIGINT UNSIGNED,
     OUT hashed_password_result VARCHAR(63),
     OUT salt_result VARCHAR(63),
-    OUT role_result VARCHAR(63)
+    OUT role_result VARCHAR(63),
+    OUT first_name_result VARCHAR(63)
 ) BEGIN -- Retrieve user credentials based on the provided username
 SELECT id,
     hashed_password,
     salt,
-    role INTO user_id_result,
+    role,
+    first_name INTO user_id_result,
     hashed_password_result,
     salt_result,
-    role_result
+    role_result,
+    first_name_result
 FROM users
 WHERE username = in_username;
 END;
@@ -61,15 +64,6 @@ VALUES (
         in_creator_id,
         UTC_TIMESTAMP()
     );
-END;
-DROP PROCEDURE IF EXISTS GetFirstName;
-CREATE PROCEDURE GetFirstName (
-    IN in_user_id BIGINT UNSIGNED,
-    OUT first_name_result VARCHAR(63)
-) BEGIN
-SELECT first_name INTO first_name_result
-FROM users
-WHERE id = in_user_id;
 END;
 DROP PROCEDURE IF EXISTS GetClockInStatus;
 CREATE PROCEDURE GetClockInStatus (
