@@ -74,11 +74,8 @@ export default function HomePage() {
     ), [])
 
   useEffect(() => {
-    console.log("USE EFFECT IS RUNNINGGGGG")
     if (axios.isAxiosError(error) && error.response?.status == 401) {
-      console.warn("USE EFFECT FOUND ISSUE")
       signOut()
-      // return <Navigate to="/login" />
     }
   }, [error])
 
