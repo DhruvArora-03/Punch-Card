@@ -98,7 +98,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if the username and password are valid.
-	userID, hashedPass, salt, err := db.GetUserCredentials(request.Username)
+	userID, hashedPass, salt, role, err := db.GetUserCredentials(request.Username)
 	if err != nil {
 		http.Error(w, "database issue", http.StatusInternalServerError)
 	}
@@ -113,16 +113,21 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generate a JWT token.
-	tokenString, err := generateJWT(userID)
+	token, err := generateJWT(userID)
 	if err != nil {
 		http.Error(w, "Error generating token", http.StatusInternalServerError)
 		return
 	}
 
-	// Respond with just the token string.
-	w.Header().Set("Content-Type", "text/plain")
+	// Respond with a JSON object
+	response := types.LoginResponseType{
+		Token: token,
+		Role:  role,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(tokenString))
+	json.NewEncoder(w).Encode(response)
 }
 
 func extractToken(r *http.Request) (*jwt.Token, error) {

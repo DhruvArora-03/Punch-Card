@@ -41,10 +41,13 @@ export default function LoginPage() {
       )
       .then((response: AxiosResponse) =>
         signIn({
-          token: response.data,
+          token: response.data.token,
           tokenType: "Bearer",
           expiresIn: 300,
-          authState: { username: values.username },
+          authState: {
+            username: values.username,
+            role: response.data.role
+          },
         })
       )
       .catch((err) => {

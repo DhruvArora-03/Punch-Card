@@ -6,13 +6,16 @@ CREATE PROCEDURE GetUserCredentials(
     IN in_username VARCHAR(63),
     OUT user_id_result BIGINT UNSIGNED,
     OUT hashed_password_result VARCHAR(63),
-    OUT user_salt_result VARCHAR(63)
+    OUT salt_result VARCHAR(63),
+    OUT role_result VARCHAR(63)
 ) BEGIN -- Retrieve user credentials based on the provided username
 SELECT id,
     hashed_password,
-    salt INTO user_id_result,
+    salt,
+    role INTO user_id_result,
     hashed_password_result,
-    user_salt_result
+    salt_result,
+    role_result
 FROM users
 WHERE username = in_username;
 END;
