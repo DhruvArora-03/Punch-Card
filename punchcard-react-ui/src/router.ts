@@ -10,6 +10,7 @@ export type Path =
   | `/login`
   | `/payments`
   | `/settings`
+  | `/users`
 
 export type Params = {
   

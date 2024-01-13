@@ -41,8 +41,9 @@ export default function NavBar(props: NavBarProps) {
       {props.mode !== NavBarModes.UnAuthenticated &&
         <>
           <Item to="/home">Home</Item>
-          <Item to="/history">History</Item>
+          <Item to="/history">Shift History</Item>
           <Item to="/payments">Payments</Item>
+          {props.mode == NavBarModes.Admin && <Item to="/users">Manage Instructors</Item>}
           <Item to="/settings">Settings</Item>
           <Item to="/login" onClick={signOut}>Log Out</Item>
         </>
