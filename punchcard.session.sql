@@ -1,9 +1,9 @@
--- @block
+--@block
 SELECT *
 FROM users;
--- @block
+--@block
 SELECT *
 FROM shifts;
--- @block
+--@block
 SELECT *
 FROM paychecks;
