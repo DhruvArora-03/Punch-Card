@@ -27,6 +27,16 @@ h1 {
   width: fit-content;
 }
 
-td {
-  width: fit-content !important;
+.table {
+  table-layout: fixed;
+}
+
+.table tbody tr td {
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  white-space: nowrap;
+}
+
+.table tbody tr:hover td {
+  white-space: wrap;
 }

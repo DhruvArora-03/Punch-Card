@@ -1,5 +1,5 @@
 import { useFormik } from "Formik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Form, InputGroup, Table } from "react-bootstrap";
 import styles from "./history.module.css";
 import Button from "components/Button";
@@ -13,12 +13,12 @@ const years = Array.from(
 );
 
 const options: Intl.DateTimeFormatOptions = {
-  year: 'numeric',
-  month: 'numeric',
-  day: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: true
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: true,
 };
 
 export default function HistoryPage() {
@@ -32,28 +32,39 @@ export default function HistoryPage() {
       year: "2024", //new Date().getFullYear(),
     },
     onSubmit: async (values: any) => {
-      setIsLoading(true)
-      await axios.get(`http://localhost:8080/shift-history/${values.month}/${values.year}`,
-        { headers: { Authorization: authHeader() } } // request config
-      )
+      setIsLoading(true);
+      await axios
+        .get(
+          `http://localhost:8080/shift-history/${values.month}/${values.year}`,
+          { headers: { Authorization: authHeader() } } // request config
+        )
         .then((response: AxiosResponse) => response.data)
         .then((data) => {
-          console.log(data)
-          setData(data.map((d: any) => {
-            const clock_in_time = new Date(d.ClockIn)
-            const clock_out_time = new Date(d.ClockOut)
-            return {
-              key: clock_in_time.getTime(),
-              clock_in_time: clock_in_time.toLocaleString('en-US', options),
-              clock_out_time: clock_out_time.toLocaleString('en-US', options),
-              duration: formatDuration(clock_out_time.getTime() - clock_in_time.getTime()),
-              user_notes: d.UserNotes,
-              admin_notes: d.AdminNotes
-            }
-          }))
-        })
-      setIsLoading(false)
+          console.log(data);
+          setData(
+            data.map((d: any) => {
+              const clock_in_time = new Date(d.ClockIn);
+              const clock_out_time = new Date(d.ClockOut);
+              return {
+                key: clock_in_time.getTime(),
+                clock_in_time: clock_in_time.toLocaleString("en-US", options),
+                clock_out_time: clock_out_time.toLocaleString("en-US", options),
+                duration: formatDuration(
+                  clock_out_time.getTime() - clock_in_time.getTime()
+                ),
+                user_notes: d.UserNotes,
+                admin_notes: d.AdminNotes,
+              };
+            })
+          );
+        });
+      setIsLoading(false);
     },
+  });
+
+  useEffect(() => {
+    if (data.length === 0) {
+    }
   });
 
   return (
@@ -108,7 +119,7 @@ export default function HistoryPage() {
           />
         </Form>
 
-        <Table striped hover bordered>
+        <Table striped hover bordered className={styles.table}>
           <thead>
             <tr>
               <th>Clock In</th>
@@ -119,7 +130,7 @@ export default function HistoryPage() {
             </tr>
           </thead>
           <tbody>
-            {data.map((row) =>
+            {data.map((row) => (
               <tr key={row.key}>
                 <td>{row.clock_in_time}</td>
                 <td>{row.clock_out_time}</td>
@@ -127,7 +138,7 @@ export default function HistoryPage() {
                 <td>{row.user_notes}</td>
                 <td>{row.admin_notes}</td>
               </tr>
-            )}
+            ))}
           </tbody>
         </Table>
       </div>
