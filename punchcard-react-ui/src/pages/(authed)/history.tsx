@@ -41,22 +41,29 @@ export default function HistoryPage() {
         .then((response: AxiosResponse) => response.data)
         .then((data) => {
           console.log(data);
-          setData(
-            data.map((d: any) => {
-              const clock_in_time = new Date(d.ClockIn);
-              const clock_out_time = new Date(d.ClockOut);
-              return {
-                key: clock_in_time.getTime(),
-                clock_in_time: clock_in_time.toLocaleString("en-US", options),
-                clock_out_time: clock_out_time.toLocaleString("en-US", options),
-                duration: formatDuration(
-                  clock_out_time.getTime() - clock_in_time.getTime()
-                ),
-                user_notes: d.UserNotes,
-                admin_notes: d.AdminNotes,
-              };
-            })
-          );
+          if (data) {
+            setData(
+              data.map((d: any) => {
+                const clock_in_time = new Date(d.ClockIn);
+                const clock_out_time = new Date(d.ClockOut);
+                return {
+                  key: clock_in_time.getTime(),
+                  clock_in_time: clock_in_time.toLocaleString("en-US", options),
+                  clock_out_time: clock_out_time.toLocaleString(
+                    "en-US",
+                    options
+                  ),
+                  duration: formatDuration(
+                    clock_out_time.getTime() - clock_in_time.getTime()
+                  ),
+                  user_notes: d.UserNotes,
+                  admin_notes: d.AdminNotes,
+                };
+              })
+            );
+          } else {
+            setData([])
+          }
         });
       setIsLoading(false);
     },
