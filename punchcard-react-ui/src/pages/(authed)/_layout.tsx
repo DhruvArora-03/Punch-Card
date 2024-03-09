@@ -11,7 +11,7 @@ export default function Layout() {
   }
 
   return <>
-    <NavBar mode={authState()?.role == "ADMIN" ? NavBarModes.Admin : NavBarModes.Default} />
+    <NavBar mode={authState()?.role.toLowerCase() == "admin" ? NavBarModes.Admin : NavBarModes.Default} />
     <RequireAuth loginPath="/login">
       <Outlet />
     </RequireAuth>
