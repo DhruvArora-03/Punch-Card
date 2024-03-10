@@ -9,9 +9,12 @@ type ShiftHistoryResult struct {
 	AdminNotes string
 }
 
-// type ShiftHistoryResult struct {
-// 	ClockIn    time.Time `json:"clock_in_time"`
-// 	ClockOut   time.Time `json:"clock_out_time"`
-// 	UserNotes  string    `json:"user_notes"`
-// 	AdminNotes string    `json:"admin_notes"`
-// }
+type UserDataResult struct {
+	UserID                 uint64
+	Username               string
+	FirstName              string
+	LastName               string
+	HourlyPay              float32
+	Role                   string
+	PreferredPaymentMethod string
+}
