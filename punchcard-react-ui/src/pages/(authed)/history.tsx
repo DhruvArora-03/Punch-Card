@@ -58,7 +58,7 @@ export default function HistoryPage() {
                   ),
                   user_notes: d.UserNotes,
                   admin_notes: d.AdminNotes,
-                };
+                } satisfies historyRowType;
               })
             );
           } else {
