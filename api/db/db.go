@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"punchcard-api/types"
 	"time"
@@ -100,7 +101,6 @@ func GetShiftHistory(userID uint64, month int, year int) ([]types.ShiftHistoryRe
 	log.Println(end)
 	rows, err := db.Query("CALL GetShiftHistory(?, ?, ?)", userID, start, end)
 	if err != nil {
-		log.Println("bruhhhh")
 		log.Fatal(err)
 	}
 	defer rows.Close()
@@ -128,6 +128,38 @@ func GetShiftHistory(userID uint64, month int, year int) ([]types.ShiftHistoryRe
 			log.Fatal(err)
 		}
 
+		// Append the struct to the slice
+		results = append(results, result)
+	}
+
+	// Check for errors from iterating over rows
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	return results, err
+}
+
+func GetAllUsers(userID uint64) ([]types.UserDataResult, error) {
+	rows, err := db.Query("CALL GetAllUsers()")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	var results []types.UserDataResult
+
+	// Iterate over rows
+	for rows.Next() {
+		var result types.UserDataResult
+
+		// Scan the values from the current row into the struct fields
+		err := rows.Scan(&result)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Println(result)
 		// Append the struct to the slice
 		results = append(results, result)
 	}
