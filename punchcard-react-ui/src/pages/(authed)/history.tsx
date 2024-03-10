@@ -69,11 +69,6 @@ export default function HistoryPage() {
     },
   });
 
-  useEffect(() => {
-    if (data.length === 0) {
-    }
-  });
-
   return (
     <>
       <div className={styles.page}>
