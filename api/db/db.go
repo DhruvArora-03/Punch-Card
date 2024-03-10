@@ -44,6 +44,18 @@ func GetUserCredentials(username string) (uint64, string, string, string, string
 	return *id, *hashPass, *salt, *role, *firstName, nil
 }
 
+func GetUserRole(userID uint64) (string, error) {
+	_, err := db.Exec("CALL GetUserRole(?, @user_role)", userID)
+
+	var role *string
+	err = db.QueryRow("SELECT @user_role").Scan(&role)
+	if err != nil || role == nil {
+		return "", err
+	}
+
+	return *role, nil
+}
+
 func parseSqlTime(sqlTime string) (time.Time, error) {
 	return time.Parse("2006-01-02 15:04:05", sqlTime)
 }
