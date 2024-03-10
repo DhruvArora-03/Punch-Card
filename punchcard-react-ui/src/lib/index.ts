@@ -1,4 +1,3 @@
-import axios from "axios";
 import { format, isToday, isYesterday } from "date-fns";
 
 export type setStateType<T> = React.Dispatch<React.SetStateAction<T>>
@@ -10,19 +9,14 @@ export type historyRowType = {
   user_notes: string;
   admin_notes: string;
 }
-
-export async function apiWrapper(callback: () => Promise<void>,
-  setError: setStateType<Error | null>,
-  setIsLoading: setStateType<boolean>
-) {
-  setIsLoading(true)
-  setError(null)
-  await callback()
-    .catch((err) => {
-      setError(err)
-      !(axios.isAxiosError(err) && err.response?.status == 401) && console.log(err)
-    })
-  setIsLoading(false)
+export type userDataType = {
+  user_id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  hourly_pay: number;
+  role: string;
+  preferred_payment_method: string;
 }
 
 export function formatClockedInMessage(date: Date) {
