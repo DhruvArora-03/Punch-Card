@@ -213,7 +213,7 @@ func GetShiftHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var response []types.ShiftHistoryResult
-	response, err = db.GetShiftHistory(userID, month, year)
+	response, _ = db.GetShiftHistory(userID, month, year)
 
 	// Respond with a JSON object
 	w.Header().Set("Content-Type", "application/json")
