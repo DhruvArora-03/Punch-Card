@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"punchcard-api/admin"
 	"punchcard-api/auth"
 	"punchcard-api/db"
 	"punchcard-api/shifts"
@@ -30,6 +31,7 @@ func setupRoutes() *mux.Router {
 	r.HandleFunc("/clock-out", auth.ValidateToken(shifts.ClockOutHandler)).Methods("POST")
 	r.HandleFunc("/clock-notes", auth.ValidateToken(shifts.SaveNotesHandler)).Methods("PUT")
 	r.HandleFunc("/shift-history/{month:[0-9]+}/{year:[0-9]+}", auth.ValidateToken(shifts.GetShiftHistoryHandler)).Methods("GET")
+	r.HandleFunc("/users", auth.ValidateToken(admin.GetAllUsersHandler)).Methods("GET")
 
 	return r
 }
