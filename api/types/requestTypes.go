@@ -20,6 +20,5 @@ type SaveNotesRequestType struct {
 	Notes string `json:"notes"`
 }
 
-type ShiftHistoryRequestType struct {
-
+type EmptyRequestType struct {
 }

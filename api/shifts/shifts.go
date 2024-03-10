@@ -196,7 +196,7 @@ func GetShiftHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// the expected request body
-	var request types.ShiftHistoryRequestType
+	var request types.EmptyRequestType
 
 	// check if body matches
 	err = json.NewDecoder(r.Body).Decode(&request)
