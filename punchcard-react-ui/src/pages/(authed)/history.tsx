@@ -62,7 +62,7 @@ export default function HistoryPage() {
               })
             );
           } else {
-            setData([])
+            setData([]);
           }
         });
       setIsLoading(false);
