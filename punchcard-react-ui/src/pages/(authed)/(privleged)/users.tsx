@@ -76,8 +76,8 @@ export default function ManageUsersPage() {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 onClick={() => navigate(`/users/${row.user_id}` as any)}
               >
-                {Object.values(row).map((item) => (
-                  <td>{item}</td>
+                {Object.values(row).map((item, i) => (
+                  <td key={`${i} - ${item}`}>{item}</td>
                 ))}
               </tr>
             ))}
