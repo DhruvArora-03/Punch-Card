@@ -166,7 +166,15 @@ func GetAllUsers(userID uint64) ([]types.UserDataResult, error) {
 		var result types.UserDataResult
 
 		// Scan the values from the current row into the struct fields
-		err := rows.Scan(&result)
+		err := rows.Scan(
+			&result.UserID,
+			&result.Username,
+			&result.FirstName,
+			&result.LastName,
+			&result.HourlyPay,
+			&result.Role,
+			&result.PreferredPaymentMethod,
+		)
 		if err != nil {
 			log.Fatal(err)
 		}
