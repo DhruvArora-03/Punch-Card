@@ -2,10 +2,10 @@ import { format, isToday, isYesterday } from "date-fns";
 
 export type setStateType<T> = React.Dispatch<React.SetStateAction<T>>;
 export type historyRowType = {
-  key: string;
+  key: number;
   clock_in_time: string;
   clock_out_time: string;
-  duration: number;
+  duration: string;
   user_notes: string;
   admin_notes: string;
 };
