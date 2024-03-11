@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import { useFormik } from "Formik";
 import { useState } from "react";
 import { useSignIn } from "react-auth-kit";
@@ -46,7 +46,7 @@ export default function LoginPage() {
           expiresIn: 300,
           authState: {
             first_name: response.data.first_name,
-            role: response.data.role
+            role: response.data.role,
           },
         })
       )
