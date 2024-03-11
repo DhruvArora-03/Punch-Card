@@ -43,6 +43,7 @@ export default function HistoryPage() {
           console.log(data);
           if (data) {
             setData(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               data.map((d: any) => {
                 const clock_in_time = new Date(d.ClockIn);
                 const clock_out_time = new Date(d.ClockOut);
