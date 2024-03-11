@@ -53,8 +53,8 @@ export default function LoginPage() {
       .catch((err) => {
         setError(err);
         console.log("Error Message: ", err.message);
-      })
-      .then(() => setIsLoading(false));
+      });
+    setIsLoading(false);
   };
 
   const formik = useFormik({
