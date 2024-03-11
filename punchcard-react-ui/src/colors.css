@@ -1,9 +1,8 @@
 html {
-  /* --background-color: rgb(253, 246, 246); */
-  /* --nav-bar-color: rgb(248, 249, 203); */
-  /* --main-color: rgb(220, 250, 220); */
-
-  --background-color: rgb(251, 252, 227);
-  --nav-bar-color: rgb(220, 250, 220);
-  --main-color: rgb(250, 232, 220);
+  /* --background-color: rgb(251, 252, 227); */
+  --background-color: rgb(253, 255, 187);
+  /* --nav-bar-color: rgb(220, 250, 220); */
+  --nav-bar-color: rgb(173, 253, 173);
+  /* --main-color: rgb(250, 232, 220); */
+  --main-color: rgb(255, 205, 157);
 }
