@@ -14,7 +14,7 @@ export default function ManageUsersPage() {
 
   useEffect(
     () => {
-      const fetchData = async () => {
+      const fetchData = async () =>
         await axios
           .get("http://localhost:8080/users", {
             headers: { Authorization: authHeader() },
@@ -42,7 +42,6 @@ export default function ManageUsersPage() {
               setData([]);
             }
           });
-      };
 
       setIsLoading(true);
       fetchData();
