@@ -11,9 +11,10 @@ export type Path =
   | `/payments`
   | `/settings`
   | `/users`
+  | `/users/:user_id`
 
 export type Params = {
-  
+  '/users/:user_id': { user_id: string }
 }
 
 export type ModalPath = never

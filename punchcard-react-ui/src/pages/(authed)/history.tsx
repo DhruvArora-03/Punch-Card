@@ -1,5 +1,5 @@
 import { useFormik } from "Formik";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Form, InputGroup, Table } from "react-bootstrap";
 import styles from "./history.module.css";
 import Button from "components/Button";
@@ -31,7 +31,7 @@ export default function HistoryPage() {
       month: "0",
       year: "2024", //new Date().getFullYear(),
     },
-    onSubmit: async (values: any) => {
+    onSubmit: async (values: { month: string; year: string }) => {
       setIsLoading(true);
       await axios
         .get(
