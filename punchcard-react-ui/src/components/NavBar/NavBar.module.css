@@ -1,8 +1,4 @@
 .navbar {
-  /* background-color: rgb(220, 242, 250); */
-  /* background-color: rgb(220, 250, 220); */
-  /* background-color: rgb(242, 222, 182); */
-  /* background-color: rgb(233, 244, 248); */
   background-color: var(--nav-bar-color);
   left: 0;
   top: 0;
