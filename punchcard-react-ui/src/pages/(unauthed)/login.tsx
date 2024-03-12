@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import { useFormik } from "Formik";
 import { useState } from "react";
 import { useSignIn } from "react-auth-kit";
-import { Form, InputGroup } from "react-bootstrap";
+import { Form, FormControl, InputGroup } from "react-bootstrap";
 import styles from "./login.module.css";
 import Button from "components/Button";
 
@@ -70,8 +70,8 @@ export default function LoginPage() {
       <Form className={styles.mainArea} onSubmit={formik.handleSubmit}>
         <h1 className={styles.title}>Log In</h1>
         <InputGroup className={styles.input}>
-          <InputGroup.Text> Username: </InputGroup.Text>
-          <Form.Control
+          <InputGroup.Text>Username: </InputGroup.Text>
+          <FormControl
             id="username"
             autoComplete="on"
             onChange={formik.handleChange}
@@ -79,8 +79,8 @@ export default function LoginPage() {
           />
         </InputGroup>
         <InputGroup className={styles.input}>
-          <InputGroup.Text> Password: </InputGroup.Text>
-          <Form.Control
+          <InputGroup.Text>Password: </InputGroup.Text>
+          <FormControl
             id="password"
             type="password"
             autoComplete="on"

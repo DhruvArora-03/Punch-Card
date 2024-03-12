@@ -5,7 +5,8 @@ import styles from "./history.module.css";
 import Button from "components/Button";
 import axios, { AxiosResponse } from "axios";
 import { useAuthHeader } from "react-auth-kit";
-import { formatDuration, historyRowType } from "lib";
+import { HistoryRowType } from "lib/types";
+import { formatDuration } from "lib/time";
 
 const years = Array.from(
   { length: new Date().getFullYear() - 2016 },
@@ -23,7 +24,7 @@ const options: Intl.DateTimeFormatOptions = {
 
 export default function HistoryPage() {
   const authHeader = useAuthHeader();
-  const [data, setData] = useState<historyRowType[]>([]);
+  const [data, setData] = useState<HistoryRowType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const formik = useFormik({
@@ -59,7 +60,7 @@ export default function HistoryPage() {
                   ),
                   user_notes: d.UserNotes,
                   admin_notes: d.AdminNotes,
-                } satisfies historyRowType;
+                } satisfies HistoryRowType;
               })
             );
           } else {

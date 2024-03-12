@@ -4,7 +4,8 @@ import { useAuthHeader, useAuthUser, useSignOut } from "react-auth-kit";
 import styles from "./home.module.css";
 import Button from "components/Button";
 import NotesBox from "components/NotesBox";
-import { apiWrapper, formatClockedInMessage, handleStaleAuthorization } from "lib";
+import { apiWrapper, handleStaleAuthorization } from "lib";
+import { formatClockedInMessage } from "lib/time";
 
 function getStatus(authHeader: () => string) {
   return axios
