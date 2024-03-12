@@ -1,3 +1,4 @@
+import axios from "axios";
 import { format, isToday, isYesterday } from "date-fns";
 
 export type setStateType<T> = React.Dispatch<React.SetStateAction<T>>;
@@ -28,6 +29,15 @@ export async function apiWrapper(
   await apiCall()
     .catch((err) => setError(err))
     .then(() => setIsLoading(false));
+}
+
+export function handleStaleAuthorization(
+  error: Error | null,
+  signOut: () => boolean
+) {
+  if (axios.isAxiosError(error) && error.response?.status == 401) {
+    signOut();
+  }
 }
 
 export function formatClockedInMessage(date: Date) {

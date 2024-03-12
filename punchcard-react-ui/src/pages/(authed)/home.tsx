@@ -4,7 +4,7 @@ import { useAuthHeader, useAuthUser, useSignOut } from "react-auth-kit";
 import styles from "./home.module.css";
 import Button from "components/Button";
 import NotesBox from "components/NotesBox";
-import { apiWrapper, formatClockedInMessage } from "lib";
+import { apiWrapper, formatClockedInMessage, handleStaleAuthorization } from "lib";
 
 function getStatus(authHeader: () => string) {
   return axios
@@ -88,11 +88,7 @@ export default function HomePage() {
     []
   );
 
-  useEffect(() => {
-    if (axios.isAxiosError(error) && error.response?.status == 401) {
-      signOut();
-    }
-  }, [error, signOut]);
+  useEffect(() => handleStaleAuthorization(error, signOut), [error, signOut]);
 
   return (
     <>
