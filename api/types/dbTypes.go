@@ -14,7 +14,7 @@ type UserDataResult struct {
 	Username               string
 	FirstName              string
 	LastName               string
-	HourlyPay              float32
+	HourlyPayCents         uint16
 	Role                   string
 	PreferredPaymentMethod string
 }

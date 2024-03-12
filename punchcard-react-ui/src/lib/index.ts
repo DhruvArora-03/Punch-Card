@@ -14,7 +14,7 @@ export type userDataType = {
   username: string;
   first_name: string;
   last_name: string;
-  hourly_pay: number;
+  hourly_pay_cents: number;
   role: string;
   preferred_payment_method: string;
 };

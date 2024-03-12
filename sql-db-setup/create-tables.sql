@@ -9,7 +9,7 @@ CREATE TABLE users (
     salt VARCHAR(63) NOT NULL,
     first_name VARCHAR(63) NOT NULL,
     last_name VARCHAR(63) NOT NULL,
-    hourly_pay DECIMAL(8, 2) NOT NULL,
+    hourly_pay_cents SMALLINT UNSIGNED NOT NULL,
     role VARCHAR(63) NOT NULL,
     preferred_payment_method VARCHAR(255) NOT NULL,
     createdBy BIGINT UNSIGNED NOT NULL,

@@ -171,7 +171,7 @@ func GetAllUsers(userID uint64) ([]types.UserDataResult, error) {
 			&result.Username,
 			&result.FirstName,
 			&result.LastName,
-			&result.HourlyPay,
+			&result.HourlyPayCents,
 			&result.Role,
 			&result.PreferredPaymentMethod,
 		)

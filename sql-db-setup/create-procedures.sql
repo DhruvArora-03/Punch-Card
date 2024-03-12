@@ -23,7 +23,7 @@ FROM users
 WHERE username = in_username;
 END;
 
--- Input: username, hashed_password, salt, first_name, last_name, hourly_pay, role, preferred_payment_method, creator_id
+-- Input: username, hashed_password, salt, first_name, last_name, hourly_pay_cents, role, preferred_payment_method, creator_id
 -- Output: None
 DROP PROCEDURE IF EXISTS CreateUser;
 CREATE PROCEDURE CreateUser(
@@ -32,7 +32,7 @@ CREATE PROCEDURE CreateUser(
     IN in_salt VARCHAR(63),
     IN in_first_name VARCHAR(63),
     IN in_last_name VARCHAR(63),
-    IN in_hourly_pay DECIMAL(8, 2),
+    IN in_hourly_pay_cents DECIMAL(8, 2),
     IN in_role VARCHAR(63),
     IN in_preferred_payment_method VARCHAR(255),
     IN in_creator_id BIGINT UNSIGNED
@@ -43,7 +43,7 @@ INSERT INTO users (
         salt,
         first_name,
         last_name,
-        hourly_pay,
+        hourly_pay_cents,
         role,
         preferred_payment_method,
         createdBy,
@@ -57,7 +57,7 @@ VALUES (
         in_salt,
         in_first_name,
         in_last_name,
-        in_hourly_pay,
+        in_hourly_pay_cents,
         in_role,
         in_preferred_payment_method,
         in_creator_id,
@@ -163,7 +163,7 @@ SELECT id,
     username,
     first_name,
     last_name,
-    hourly_pay,
+    hourly_pay_cents,
     role,
     preferred_payment_method
 FROM users;

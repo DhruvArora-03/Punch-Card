@@ -32,7 +32,7 @@ export default function ManageUsersPage() {
                       username: d.Username,
                       first_name: d.FirstName,
                       last_name: d.LastName,
-                      hourly_pay: d.HourlyPay,
+                      hourly_pay_cents: d.HourlyPayCents,
                       role: d.Role,
                       preferred_payment_method: d.PreferredPaymentMethod,
                     } satisfies userDataType)
