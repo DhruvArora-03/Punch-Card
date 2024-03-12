@@ -2,6 +2,9 @@ package types
 
 import "time"
 
+type EmptyRequestType struct {
+}
+
 type LoginRequestType struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -18,7 +21,4 @@ type ClockOutRequestType struct {
 
 type SaveNotesRequestType struct {
 	Notes string `json:"notes"`
-}
-
-type EmptyRequestType struct {
 }
