@@ -197,3 +197,28 @@ func GetAllUsers(userID uint64) ([]types.UserDataResult, error) {
 
 	return results, err
 }
+
+func GetUser(userID uint64) (types.UserDataResult, error) {
+	_, err := db.Exec("CALL GetUser(?, @username, @first_name, @last_name, @hourly_pay, @role, @preferred_payment_method)", userID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var result types.UserDataResult
+	result.UserID = userID
+
+	err = db.QueryRow("SELECT @username, @first_name, @last_name, @hourly_pay, @role, @preferred_payment_method").Scan(
+		&result.Username,
+		&result.FirstName,
+		&result.LastName,
+		&result.HourlyPayCents,
+		&result.Role,
+		&result.PreferredPaymentMethod,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(result)
+	return result, err
+}

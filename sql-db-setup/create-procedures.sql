@@ -22,7 +22,6 @@ SELECT id,
 FROM users
 WHERE username = in_username;
 END;
-
 -- Input: username, hashed_password, salt, first_name, last_name, hourly_pay_cents, role, preferred_payment_method, creator_id
 -- Output: None
 DROP PROCEDURE IF EXISTS CreateUser;
@@ -32,7 +31,7 @@ CREATE PROCEDURE CreateUser(
     IN in_salt VARCHAR(63),
     IN in_first_name VARCHAR(63),
     IN in_last_name VARCHAR(63),
-    IN in_hourly_pay_cents DECIMAL(8, 2),
+    IN in_hourly_pay_cents SMALLINT UNSIGNED,
     IN in_role VARCHAR(63),
     IN in_preferred_payment_method VARCHAR(255),
     IN in_creator_id BIGINT UNSIGNED
@@ -66,7 +65,6 @@ VALUES (
         UTC_TIMESTAMP()
     );
 END;
-
 DROP PROCEDURE IF EXISTS GetClockInStatus;
 CREATE PROCEDURE GetClockInStatus (
     IN in_user_id BIGINT UNSIGNED,
@@ -80,7 +78,6 @@ FROM shifts
 WHERE user_id = in_user_id
     AND clock_out IS NULL;
 END;
-
 DROP PROCEDURE IF EXISTS ClockIn;
 CREATE PROCEDURE ClockIn (
     IN in_user_id BIGINT UNSIGNED,
@@ -111,7 +108,6 @@ VALUES (
         UTC_TIMESTAMP()
     );
 END;
-
 DROP PROCEDURE IF EXISTS ClockOut;
 CREATE PROCEDURE ClockOut (
     IN in_user_id BIGINT UNSIGNED,
@@ -127,7 +123,6 @@ WHERE user_id = in_user_id
     AND clock_out IS NULL;
 -- Only update if the shift has not been clocked out before
 END;
-
 DROP PROCEDURE IF EXISTS UpdateNotes;
 CREATE PROCEDURE UpdateNotes (
     IN in_user_id BIGINT UNSIGNED,
@@ -140,7 +135,6 @@ SET user_notes = in_notes,
 WHERE user_id = in_user_id
     AND clock_out IS NULL;
 END;
-
 DROP PROCEDURE IF EXISTS GetShiftHistory;
 CREATE PROCEDURE GetShiftHistory(
     IN in_user_id BIGINT UNSIGNED,
@@ -156,7 +150,6 @@ WHERE user_id = in_user_id
     AND clock_in >= lower_bound
     AND clock_out <= upper_bound;
 END;
-
 DROP PROCEDURE IF EXISTS GetAllUsers;
 CREATE PROCEDURE GetAllUsers() BEGIN
 SELECT id,
@@ -168,14 +161,36 @@ SELECT id,
     preferred_payment_method
 FROM users;
 END;
-
+DROP PROCEDURE IF EXISTS GetUser;
+CREATE PROCEDURE GetUser(
+    IN in_user_id BIGINT UNSIGNED,
+    OUT username_result VARCHAR(63),
+    OUT first_name_result VARCHAR(63),
+    OUT last_name_result VARCHAR(63),
+    OUT hourly_pay_cents_result SMALLINT UNSIGNED,
+    OUT role_result VARCHAR(63),
+    OUT preferred_payment_method_result VARCHAR(255)
+) BEGIN
+SELECT username,
+    first_name,
+    last_name,
+    hourly_pay_cents,
+    role,
+    preferred_payment_method INTO username_result,
+    first_name_result,
+    last_name_result,
+    hourly_pay_cents_result,
+    role_result,
+    preferred_payment_method_result
+FROM users
+WHERE id = in_user_id;
+END;
 DROP PROCEDURE IF EXISTS GetUserRole;
 CREATE PROCEDURE GetUserRole(
     IN in_user_id BIGINT UNSIGNED,
     OUT role_result VARCHAR(63)
-)
-BEGIN
-SELECT role into role_result 
+) BEGIN
+SELECT role INTO role_result
 FROM users
 WHERE id = in_user_id;
 END;
