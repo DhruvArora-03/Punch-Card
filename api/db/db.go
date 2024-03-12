@@ -32,6 +32,9 @@ func ConnectToDB() (*sql.DB, error) {
 
 func GetUserCredentials(username string) (uint64, string, string, string, string, error) {
 	_, err := db.Exec("CALL GetUserCredentials(?, @user_id, @user_hashed_password, @user_salt, @user_role, @user_first_name)", username)
+	if err != nil {
+		return 0, "", "", "", "", err
+	}
 
 	// Retrieve the output variables
 	var id *uint64
@@ -46,6 +49,9 @@ func GetUserCredentials(username string) (uint64, string, string, string, string
 
 func GetUserRole(userID uint64) (string, error) {
 	_, err := db.Exec("CALL GetUserRole(?, @user_role)", userID)
+	if err != nil {
+		return "", err
+	}
 
 	var role *string
 	err = db.QueryRow("SELECT @user_role").Scan(&role)
