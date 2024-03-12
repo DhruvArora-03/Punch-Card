@@ -69,13 +69,17 @@ export default function ManageUsersPage() {
             </tr>
           </thead>
           <tbody>
-            {data.map((row) => (
+            {data.map((row: userDataType) => (
               <tr
                 key={row.user_id}
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 onClick={() => navigate(`/users/${row.user_id}` as any)}
               >
-                {Object.values(row).map((item, i) => (
+                {Object.values({
+                  ...row,
+                  // its more convient to change value without updating the name, however it no longer represents cents
+                  hourly_pay_cents: row.hourly_pay_cents / 100,
+                }).map((item, i) => (
                   <td key={`${i} - ${item}`}>{item}</td>
                 ))}
               </tr>
