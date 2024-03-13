@@ -64,9 +64,13 @@ export default function ViewUsersPage() {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   onClick={() => navigate(`/users/${row.user_id}` as any)}
                 >
-                  {Object.values(row).map((item, i) => (
-                    <td key={`${i} - ${item}`}>{item}</td>
-                  ))}
+                  <td>{row.user_id}</td>
+                  <td>{row.username}</td>
+                  <td>{row.first_name}</td>
+                  <td>{row.last_name}</td>
+                  <td>{row.hourly_pay}</td>
+                  <td>{row.role}</td>
+                  <td>{row.preferred_payment_method}</td>
                 </tr>
               ))}
           </tbody>
