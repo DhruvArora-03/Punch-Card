@@ -7,7 +7,7 @@ import styles from "./login.module.css";
 import Button from "components/Button";
 
 export default function LoginPage() {
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<Error>();
   const [isLoading, setIsLoading] = useState(false);
   const signIn = useSignIn();
   const encoder = new TextEncoder();
@@ -29,7 +29,7 @@ export default function LoginPage() {
   };
 
   const onSubmit = async (values: { username: string; password: string }) => {
-    setError(null);
+    setError(undefined);
     setIsLoading(true);
 
     await hashPassword(values.password)

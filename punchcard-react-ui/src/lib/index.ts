@@ -1,9 +1,9 @@
 import axios from "axios";
-import { setStateType } from "./types";
+import { DisplayUser, InternalUser, setStateType } from "./types";
 
 export async function apiWrapper(
   apiCall: () => Promise<void>,
-  setError: setStateType<Error | null>,
+  setError: setStateType<Error | undefined>,
   setIsLoading: setStateType<boolean>
 ) {
   setIsLoading(true);
@@ -13,10 +13,10 @@ export async function apiWrapper(
 }
 
 export function handleStaleAuthorization(
-  error: Error | null,
+  error: Error | undefined,
   signOut: () => boolean
 ) {
-  if (axios.isAxiosError(error) && error.response?.status == 401) {
+  if (error && axios.isAxiosError(error) && error.response?.status == 401) {
     signOut();
   }
 }
@@ -26,4 +26,22 @@ export function snakeCaseToCapitalized(input: string) {
     .split("_")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+export function convertUserToDisplay(user: InternalUser) {
+  const { hourly_pay_cents: cents, ...rest } = user;
+
+  return {
+    hourly_pay: cents / 100,
+    ...rest,
+  } satisfies DisplayUser;
+}
+
+export function convertUserFromDisplay(user: DisplayUser) {
+  const { hourly_pay: pay, ...rest } = user;
+
+  return {
+    hourly_pay_cents: Math.floor(pay * 100),
+    ...rest,
+  } satisfies InternalUser;
 }

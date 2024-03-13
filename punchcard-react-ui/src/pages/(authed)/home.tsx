@@ -58,7 +58,7 @@ export default function HomePage() {
   const [notes, setNotes] = useState("");
   const [isNotesLoading, setIsNotesLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<Error>();
   const [status, setStatus] = useState({
     is_clocked_in: false,
     clock_in_time: "",
