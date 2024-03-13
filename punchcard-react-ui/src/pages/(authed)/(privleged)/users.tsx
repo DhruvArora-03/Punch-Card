@@ -6,6 +6,7 @@ import axios, { AxiosResponse } from "axios";
 import { Table } from "react-bootstrap";
 import { useNavigate } from "router";
 import { DisplayUser, InternalUser } from "lib/types";
+import Button from "components/Button";
 
 export default function ViewUsersPage() {
   const navigate = useNavigate();
@@ -41,8 +42,19 @@ export default function ViewUsersPage() {
 
   return (
     <div className={styles.page}>
-      <h1>View Users</h1>
-      <h5>Click row to see more</h5>
+      <section className={styles.titleRow}>
+        <div>
+          <h1>View Users</h1>
+          <h5>Click row to see more</h5>
+        </div>
+        <Button
+          className={styles.createUserButton}
+          color="blue"
+          text="Create User"
+          type="button"
+          onClick={() => {}}
+        />
+      </section>
       {!isLoading && (
         <Table striped hover bordered>
           <thead>

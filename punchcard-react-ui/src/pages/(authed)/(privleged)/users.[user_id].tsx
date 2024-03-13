@@ -67,6 +67,7 @@ export default function EditUser() {
               <TextInput field_id="role" />
               <TextInput field_id="preferred_payment_method" />
               <Button
+                color="blue"
                 text="Save Changes"
                 type="submit"
                 loading={isSubmitting}

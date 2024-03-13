@@ -4,3 +4,16 @@
   padding: 20px;
 }
 
+.titleRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 0 15px 0;
+}
+
+.createUserButton {
+  height: fit-content;
+  min-width: fit-content;
+  width: 25%;
+  align-self: flex-end;
+}
