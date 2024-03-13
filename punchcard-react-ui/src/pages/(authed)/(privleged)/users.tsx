@@ -68,9 +68,13 @@ export default function ViewUsersPage() {
                   <td>{row.username}</td>
                   <td>{row.first_name}</td>
                   <td>{row.last_name}</td>
-                  <td>{row.hourly_pay}</td>
+                  <td>{`$${row.hourly_pay.toFixed(2)}`}</td>
                   <td>{row.role}</td>
-                  <td>{row.preferred_payment_method}</td>
+                  <td>
+                    {row.preferred_payment_method == ""
+                      ? "N/A"
+                      : row.preferred_payment_method}
+                  </td>
                 </tr>
               ))}
           </tbody>
