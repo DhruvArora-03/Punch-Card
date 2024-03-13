@@ -25,7 +25,9 @@ export default function ButtonComponent(props: ButtonProps) {
   return (
     <Button
       className={props.className}
-      variant={(props.outline ? "outline-" : "") + convert[props.color ?? "blue"]}
+      variant={
+        (props.outline ? "outline-" : "") + convert[props.color ?? "blue"]
+      }
       disabled={props.disabled || props.loading}
       type={props.type}
       onClick={props.onClick}
