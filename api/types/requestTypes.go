@@ -2,23 +2,23 @@ package types
 
 import "time"
 
-type EmptyRequestType struct {
+type Empty struct {
 }
 
-type LoginRequestType struct {
+type Login struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
-type ClockInRequestType struct {
+type ClockIn struct {
 	Time time.Time `json:"time"`
 }
 
-type ClockOutRequestType struct {
+type ClockOut struct {
 	Time  time.Time `json:"time"`
 	Notes string    `json:"notes"`
 }
 
-type SaveNotesRequestType struct {
+type Notes struct {
 	Notes string `json:"notes"`
 }

@@ -88,7 +88,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// the expected request body
-	var request types.LoginRequestType
+	var request types.Login
 
 	// check if body matches
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -120,7 +120,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Respond with a JSON object
-	response := types.LoginResponseType{
+	response := types.LoginResponse{
 		Token:     token,
 		Role:      role,
 		FirstName: firstName,

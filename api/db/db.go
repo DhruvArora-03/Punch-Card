@@ -111,7 +111,7 @@ func generateBounds(month int, year int) (time.Time, time.Time) {
 	return time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC), time.Date(year, time.Month(month+1), 1, 0, 0, 0, 0, time.UTC)
 }
 
-func GetShiftHistory(userID uint64, month int, year int) ([]types.ShiftHistoryResult, error) {
+func GetShiftHistory(userID uint64, month int, year int) ([]types.Shift, error) {
 	start, end := generateBounds(month, year)
 	log.Println(month, time.Month(month))
 	log.Println(year)
@@ -123,11 +123,11 @@ func GetShiftHistory(userID uint64, month int, year int) ([]types.ShiftHistoryRe
 	}
 	defer rows.Close()
 
-	var results []types.ShiftHistoryResult
+	var results []types.Shift
 
 	// Iterate over rows
 	for rows.Next() {
-		var result types.ShiftHistoryResult
+		var result types.Shift
 		var clockIn, clockOut *string
 
 		// Scan the values from the current row into the struct fields
@@ -158,18 +158,18 @@ func GetShiftHistory(userID uint64, month int, year int) ([]types.ShiftHistoryRe
 	return results, err
 }
 
-func GetAllUsers(userID uint64) ([]types.UserDataResult, error) {
+func GetAllUsers(userID uint64) ([]types.User, error) {
 	rows, err := db.Query("CALL GetAllUsers()")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
 
-	var results []types.UserDataResult
+	var results []types.User
 
 	// Iterate over rows
 	for rows.Next() {
-		var result types.UserDataResult
+		var result types.User
 
 		// Scan the values from the current row into the struct fields
 		err := rows.Scan(
@@ -198,13 +198,13 @@ func GetAllUsers(userID uint64) ([]types.UserDataResult, error) {
 	return results, err
 }
 
-func GetUser(userID uint64) (types.UserDataResult, error) {
+func GetUser(userID uint64) (types.User, error) {
 	_, err := db.Exec("CALL GetUser(?, @username, @first_name, @last_name, @hourly_pay, @role, @preferred_payment_method)", userID)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var result types.UserDataResult
+	var result types.User
 	result.UserID = userID
 
 	err = db.QueryRow("SELECT @username, @first_name, @last_name, @hourly_pay, @role, @preferred_payment_method").Scan(
@@ -221,4 +221,19 @@ func GetUser(userID uint64) (types.UserDataResult, error) {
 
 	fmt.Println(result)
 	return result, err
+}
+
+func UpdateUser(user types.User) {
+	_, err := db.Exec("CALL UpdateUser(?, ?, ?, ?, ?, ?, ?, ?)",
+		user.UserID,
+		user.Username,
+		user.FirstName,
+		user.LastName,
+		user.HourlyPayCents,
+		user.Role,
+		user.PreferredPaymentMethod,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

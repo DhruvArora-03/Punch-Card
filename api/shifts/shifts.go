@@ -36,7 +36,7 @@ func GetStatusHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Respond with a JSON object
-	response := types.StatusResponseType{
+	response := types.Status{
 		IsClockedIn: isClockedIn,
 		ClockInTime: clockInTime,
 		Notes:       notes,
@@ -57,7 +57,7 @@ func ClockInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// the expected request body
-	var request types.ClockInRequestType
+	var request types.ClockIn
 
 	// check if body matches
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -80,7 +80,7 @@ func ClockInHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Respond with a JSON object
-	response := types.ClockResponseType{
+	response := types.ClockResponse{
 		IsClockedIn: true,
 		ClockInTime: request.Time,
 	}
@@ -100,7 +100,7 @@ func ClockOutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// the expected request body
-	var request types.ClockOutRequestType
+	var request types.ClockOut
 
 	// check if body matches
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -123,7 +123,7 @@ func ClockOutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Respond with a JSON object
-	response := types.ClockResponseType{
+	response := types.ClockResponse{
 		IsClockedIn: false,
 		ClockInTime: time.Time{},
 	}
@@ -143,7 +143,7 @@ func SaveNotesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// the expected request body
-	var request types.SaveNotesRequestType
+	var request types.Notes
 
 	// check if body matches
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -196,7 +196,7 @@ func GetShiftHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// the expected request body
-	var request types.EmptyRequestType
+	var request types.Empty
 
 	// check if body matches
 	err = json.NewDecoder(r.Body).Decode(&request)
@@ -212,7 +212,7 @@ func GetShiftHistoryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response []types.ShiftHistoryResult
+	var response []types.Shift
 	response, _ = db.GetShiftHistory(userID, month, year)
 
 	// Respond with a JSON object

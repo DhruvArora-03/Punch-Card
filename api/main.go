@@ -33,6 +33,7 @@ func setupRoutes() *mux.Router {
 	r.HandleFunc("/shift-history/{month:[0-9]+}/{year:[0-9]+}", auth.ValidateToken(shifts.GetShiftHistoryHandler)).Methods("GET")
 	r.HandleFunc("/users", auth.ValidateToken(admin.GetAllUsersHandler)).Methods("GET")
 	r.HandleFunc("/user/{userID:[0-9]+}", auth.ValidateToken(admin.GetUserHandler)).Methods("GET")
+	r.HandleFunc("/user", auth.ValidateToken(admin.UpdateUserHandler)).Methods("PUT")
 
 	return r
 }
