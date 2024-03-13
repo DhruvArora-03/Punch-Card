@@ -1,16 +1,21 @@
-import { useAuthHeader } from "react-auth-kit";
+import { useAuthHeader, useSignOut } from "react-auth-kit";
 import styles from "./users.module.css";
-import { userDataType } from "lib/index";
+import { convertUserToDisplay, handleStaleAuthorization } from "lib/index";
 import { useEffect, useState } from "react";
 import axios, { AxiosResponse } from "axios";
 import { Table } from "react-bootstrap";
 import { useNavigate } from "router";
+import { DisplayUser, InternalUser } from "lib/types";
 
-export default function ManageUsersPage() {
+export default function ViewUsersPage() {
   const navigate = useNavigate();
   const authHeader = useAuthHeader();
-  const [data, setData] = useState<userDataType[]>([]);
+  const signOut = useSignOut();
+  const [data, setData] = useState<DisplayUser[]>();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error>();
+
+  useEffect(() => handleStaleAuthorization(error, signOut), [error, signOut]);
 
   useEffect(
     () => {
@@ -20,28 +25,11 @@ export default function ManageUsersPage() {
             headers: { Authorization: authHeader() },
           })
           .then((response: AxiosResponse) => response.data)
-          .then((data) => {
+          .then((data: InternalUser[]) => {
             console.log(data);
-            if (data) {
-              setData(
-                data.map(
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  (d: any) =>
-                    ({
-                      user_id: d.UserID,
-                      username: d.Username,
-                      first_name: d.FirstName,
-                      last_name: d.LastName,
-                      hourly_pay_cents: d.HourlyPayCents,
-                      role: d.Role,
-                      preferred_payment_method: d.PreferredPaymentMethod,
-                    } satisfies userDataType)
-                )
-              );
-            } else {
-              setData([]);
-            }
-          });
+            setData(data.map(convertUserToDisplay));
+          })
+          .catch(setError);
 
       setIsLoading(true);
       fetchData();
@@ -53,8 +41,8 @@ export default function ManageUsersPage() {
 
   return (
     <div className={styles.page}>
-      <h1>Manage Users</h1>
-      <h5>Click row to edit user</h5>
+      <h1>View Users</h1>
+      <h5>Click row to see more</h5>
       {!isLoading && (
         <Table striped hover bordered>
           <thead>
@@ -69,21 +57,18 @@ export default function ManageUsersPage() {
             </tr>
           </thead>
           <tbody>
-            {data.map((row: userDataType) => (
-              <tr
-                key={row.user_id}
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                onClick={() => navigate(`/users/${row.user_id}` as any)}
-              >
-                {Object.values({
-                  ...row,
-                  // its more convient to change value without updating the name, however it no longer represents cents
-                  hourly_pay_cents: row.hourly_pay_cents / 100,
-                }).map((item, i) => (
-                  <td key={`${i} - ${item}`}>{item}</td>
-                ))}
-              </tr>
-            ))}
+            {data &&
+              data.map((row: DisplayUser) => (
+                <tr
+                  key={row.user_id}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  onClick={() => navigate(`/users/${row.user_id}` as any)}
+                >
+                  {Object.values(row).map((item, i) => (
+                    <td key={`${i} - ${item}`}>{item}</td>
+                  ))}
+                </tr>
+              ))}
           </tbody>
         </Table>
       )}

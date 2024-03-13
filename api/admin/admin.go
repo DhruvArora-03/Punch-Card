@@ -149,7 +149,8 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Employees are not allowed to access this resource", http.StatusUnauthorized)
 	}
 
-	db.UpdateUser(request)
+	fmt.Println(request)
+	db.UpdateUser(request, userID)
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)

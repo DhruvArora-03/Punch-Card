@@ -9,7 +9,7 @@ export type HistoryRowType = {
   admin_notes: string;
 };
 
-export type UserDataType = {
+export type InternalUser = {
   user_id: number;
   username: string;
   first_name: string;
@@ -20,14 +20,11 @@ export type UserDataType = {
 };
 
 // swap out cents for normal and take out user_id
-export type UserDataDisplayType = Omit<
-  UserDataType,
-  "hourly_pay_cents" | "user_id"
-> & {
+export type DisplayUser = Omit<InternalUser, "hourly_pay_cents"> & {
   hourly_pay: number;
 };
 
 export type FormItemProps = {
   label?: string;
-  field_id: keyof UserDataDisplayType;
+  field_id: keyof DisplayUser;
 };

@@ -49,7 +49,7 @@ export default function NavBar(props: NavBarProps) {
             <Item to="/history">Shift History</Item>
             <Item to="/payments">Payments</Item>
             {props.mode == NavBarModes.Admin && (
-              <Item to="/users">Manage Users</Item>
+              <Item to="/users">Users</Item>
             )}
             <Item to="/settings">Settings</Item>
             <Item to="/login" onClick={signOut}>

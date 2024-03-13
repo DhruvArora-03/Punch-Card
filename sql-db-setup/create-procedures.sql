@@ -120,8 +120,8 @@ SET clock_out = in_clock_out,
     updatedBy = in_user_id,
     updatedAt = UTC_TIMESTAMP()
 WHERE user_id = in_user_id
-    AND clock_out IS NULL;
 -- Only update if the shift has not been clocked out before
+    AND clock_out IS NULL;
 END;
 DROP PROCEDURE IF EXISTS UpdateNotes;
 CREATE PROCEDURE UpdateNotes (
@@ -192,5 +192,27 @@ CREATE PROCEDURE GetUserRole(
 ) BEGIN
 SELECT role INTO role_result
 FROM users
+WHERE id = in_user_id;
+END;
+DROP PROCEDURE IF EXISTS UpdateUser;
+CREATE PROCEDURE UpdateUser(
+    IN in_user_id BIGINT UNSIGNED,
+    IN in_username VARCHAR(63),
+    IN in_first_name VARCHAR(63),
+    IN in_last_name VARCHAR(63),
+    IN in_hourly_pay_cents SMALLINT UNSIGNED,
+    IN in_role VARCHAR(63),
+    IN in_preferred_payment_method VARCHAR(255),
+    IN in_updater_id BIGINT UNSIGNED
+) BEGIN -- Insert the new user into the 'users' table
+UPDATE users
+SET username = in_username,
+    first_name = in_first_name,
+    last_name = in_last_name,
+    hourly_pay_cents = in_hourly_pay_cents,
+    role = in_role,
+    preferred_payment_method = in_preferred_payment_method,
+    updatedBy = in_updater_id,
+    updatedAt = UTC_TIMESTAMP()
 WHERE id = in_user_id;
 END;
