@@ -17,7 +17,7 @@ import axios, { AxiosResponse } from "axios";
 export default function EditUser() {
   const authHeader = useAuthHeader();
   const signOut = useSignOut();
-  const { user_id } = useParams("/users/:user_id");
+  const { user_id } = useParams("/users/view/:user_id");
   const [originalValues, setOriginalValues] = useState<DisplayUser>();
   const [error, setError] = useState<Error>();
 
@@ -27,7 +27,7 @@ export default function EditUser() {
   useEffect(() => {
     const fetchData = async () =>
       await axios
-        .get(`http://localhost:8080/user/${user_id}`, {
+        .get(`http://localhost:8080/users/${user_id}`, {
           headers: { Authorization: authHeader() },
         })
         .then((response: AxiosResponse) => response.data satisfies InternalUser)
@@ -41,9 +41,13 @@ export default function EditUser() {
 
   const submitUpdate = async (values: DisplayUser) => {
     await axios
-      .put(`http://localhost:8080/user`, convertUserFromDisplay(values), {
-        headers: { Authorization: authHeader() },
-      })
+      .put(
+        `http://localhost:8080/users/${user_id}`,
+        convertUserFromDisplay(values),
+        {
+          headers: { Authorization: authHeader() },
+        }
+      )
       .then(console.log);
   };
 

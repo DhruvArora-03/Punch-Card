@@ -52,7 +52,7 @@ export default function ViewUsersPage() {
           color="blue"
           text="Create User"
           type="button"
-          onClick={() => {}}
+          onClick={() => navigate("/users/create")}
         />
       </section>
       {!isLoading && (
@@ -74,7 +74,7 @@ export default function ViewUsersPage() {
                 <tr
                   key={row.user_id}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  onClick={() => navigate(`/users/${row.user_id}` as any)}
+                  onClick={() => navigate(`/users/view/${row.user_id}` as any)}
                 >
                   <td>{row.user_id}</td>
                   <td>{row.username}</td>

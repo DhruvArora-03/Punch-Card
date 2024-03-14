@@ -24,6 +24,10 @@ export type DisplayUser = Omit<InternalUser, "hourly_pay_cents"> & {
   hourly_pay: number;
 };
 
+export type NewUser = InternalUser & {
+  // pas
+}
+
 export type FormItemProps = {
   label?: string;
   field_id: keyof DisplayUser;
