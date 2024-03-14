@@ -14,11 +14,6 @@ import (
 	"github.com/rs/cors"
 )
 
-// In-memory storage for simplicity (replace with a database in a real-world scenario).
-var users = map[string]string{
-	"example": "password",
-}
-
 func setupRoutes() *mux.Router {
 	r := mux.NewRouter()
 
@@ -31,9 +26,12 @@ func setupRoutes() *mux.Router {
 	r.HandleFunc("/clock-out", auth.ValidateToken(shifts.ClockOutHandler)).Methods("POST")
 	r.HandleFunc("/clock-notes", auth.ValidateToken(shifts.SaveNotesHandler)).Methods("PUT")
 	r.HandleFunc("/shift-history/{month:[0-9]+}/{year:[0-9]+}", auth.ValidateToken(shifts.GetShiftHistoryHandler)).Methods("GET")
-	r.HandleFunc("/users", auth.ValidateToken(admin.GetAllUsersHandler)).Methods("GET")
-	r.HandleFunc("/user/{userID:[0-9]+}", auth.ValidateToken(admin.GetUserHandler)).Methods("GET")
-	r.HandleFunc("/user", auth.ValidateToken(admin.UpdateUserHandler)).Methods("PUT")
+
+	// admin authed routes
+	r.HandleFunc("/users", auth.CheckAuthorization(auth.ValidateToken(admin.CreateUserHandler))).Methods("POST")
+	r.HandleFunc("/users", auth.CheckAuthorization(auth.ValidateToken(admin.GetAllUsersHandler))).Methods("GET")
+	r.HandleFunc("/users/{userID:[0-9]+}", auth.CheckAuthorization(auth.ValidateToken(admin.GetUserHandler))).Methods("GET")
+	r.HandleFunc("/users/{userID:[0-9]+}", auth.CheckAuthorization(auth.ValidateToken(admin.UpdateUserHandler))).Methods("PUT")
 
 	return r
 }

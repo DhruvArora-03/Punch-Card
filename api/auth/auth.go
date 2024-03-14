@@ -82,11 +82,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now())
 	fmt.Printf("%s ~/login\n\n", r.Method)
 
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	// the expected request body
 	var request types.Login
 
@@ -189,5 +184,30 @@ func ValidateToken(next http.HandlerFunc) http.HandlerFunc {
 		} else {
 			http.Error(w, "Invalid authorization token", http.StatusUnauthorized)
 		}
+	})
+}
+
+func CheckAuthorization(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userID, err := h.ExtractUserID(r)
+		if err != nil {
+			http.Error(w, "ExtractUserID failed despite successful ValidateToken", http.StatusInternalServerError)
+			return
+		}
+
+		userRole, err := db.GetUserRole(userID)
+		if err != nil {
+			http.Error(w, "GetUserRole failed, internal issue", http.StatusInternalServerError)
+			return
+		}
+
+		// check perms - tutor cannot access
+		if strings.ToLower(userRole) == "Tutors," {
+			http.Error(w, "Unauthorized access this resource", http.StatusUnauthorized)
+			return
+		}
+
+		// authorized --> continue to next
+		next.ServeHTTP(w, r)
 	})
 }

@@ -17,11 +17,6 @@ func GetStatusHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now())
 	fmt.Printf("%s ~/status\n\n", r.Method)
 
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	userID, err := auth.ExtractUserID(r)
 	if err != nil {
 		http.Error(w, "Extraction failed unexpectedly", http.StatusInternalServerError)
@@ -50,11 +45,6 @@ func GetStatusHandler(w http.ResponseWriter, r *http.Request) {
 func ClockInHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now())
 	fmt.Printf("%s ~/clock-in\n\n", r.Method)
-
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	// the expected request body
 	var request types.ClockIn
@@ -94,11 +84,6 @@ func ClockOutHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now())
 	fmt.Printf("%s ~/clock-out\n\n", r.Method)
 
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	// the expected request body
 	var request types.ClockOut
 
@@ -137,11 +122,6 @@ func SaveNotesHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now())
 	fmt.Printf("%s ~/clock-notes\n\n", r.Method)
 
-	if r.Method != http.MethodPut {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
 	// the expected request body
 	var request types.Notes
 
@@ -173,11 +153,6 @@ func SaveNotesHandler(w http.ResponseWriter, r *http.Request) {
 func GetShiftHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(time.Now())
 	fmt.Printf("%s ~/shift-history\n\n", r.Method)
-
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	var err error
 	var month, year int

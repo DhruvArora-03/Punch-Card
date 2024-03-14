@@ -158,7 +158,7 @@ func GetShiftHistory(userID uint64, month int, year int) ([]types.Shift, error) 
 	return results, err
 }
 
-func GetAllUsers(userID uint64) ([]types.User, error) {
+func GetAllUsers() ([]types.User, error) {
 	rows, err := db.Query("CALL GetAllUsers()")
 	if err != nil {
 		log.Fatal(err)
@@ -185,7 +185,6 @@ func GetAllUsers(userID uint64) ([]types.User, error) {
 			log.Fatal(err)
 		}
 
-		fmt.Println(result)
 		// Append the struct to the slice
 		results = append(results, result)
 	}
