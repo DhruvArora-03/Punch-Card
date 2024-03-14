@@ -10,7 +10,8 @@ type ButtonProps = {
   type?: "button" | "submit" | "reset";
   color?: "blue" | "red" | "green" | "yellow" | "gray";
   outline?: boolean;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>; 
+  href?: string;
 };
 
 const convert = {
@@ -24,6 +25,8 @@ const convert = {
 export default function ButtonComponent(props: ButtonProps) {
   return (
     <Button
+      as={props.href ? 'a': undefined}
+      href={props.href}
       className={props.className}
       variant={
         (props.outline ? "outline-" : "") + convert[props.color ?? "blue"]
