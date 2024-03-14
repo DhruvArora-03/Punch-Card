@@ -189,7 +189,7 @@ func ValidateToken(next http.HandlerFunc) http.HandlerFunc {
 
 func CheckAuthorization(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userID, err := h.ExtractUserID(r)
+		userID, err := ExtractUserID(r)
 		if err != nil {
 			http.Error(w, "ExtractUserID failed despite successful ValidateToken", http.StatusInternalServerError)
 			return
