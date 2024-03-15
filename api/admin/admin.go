@@ -14,7 +14,51 @@ import (
 )
 
 func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
-		
+	fmt.Println(time.Now())
+	fmt.Printf("%s ~/users\n\n", r.Method)
+
+	// the expected request body
+	var request types.CreateUserRequest
+
+	// check if body matches
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil && err.Error() != "EOF" {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	var user types.NewUser
+	user.Username = request.Username
+	user.FirstName = request.FirstName
+	user.LastName = request.LastName
+	user.HourlyPayCents = request.HourlyPayCents
+	user.Role = request.Role
+	user.PreferredPaymentMethod = request.PreferredPaymentMethod
+
+	user.Salt, err = auth.GenerateSalt()
+	if err != nil {
+		http.Error(w, "Internal Error, could not generate a valid salt - "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	user.HashedPassword, err = auth.HashPassword(request.Password, user.Salt)
+	if err != nil {
+		http.Error(w, "Internal error, could not hash password - "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var requesterID uint64
+	requesterID, err = auth.ExtractUserID(r)
+	if err != nil {
+		http.Error(w, "ExtractUserID failed despite successful ValidateToken", http.StatusInternalServerError)
+		return
+	}
+
+	db.CreateUser(user, requesterID)
+
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Created!"))
 }
 
 func GetAllUsersHandler(w http.ResponseWriter, r *http.Request) {
@@ -105,14 +149,14 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var userID uint64
-	userID, err = auth.ExtractUserID(r)
+	var requesterID uint64
+	requesterID, err = auth.ExtractUserID(r)
 	if err != nil {
 		http.Error(w, "ExtractUserID failed despite successful ValidateToken", http.StatusInternalServerError)
 		return
 	}
 
-	db.UpdateUser(request, userID)
+	db.UpdateUser(request, requesterID)
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)

@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"punchcard-api/types"
 	"time"
@@ -158,6 +157,23 @@ func GetShiftHistory(userID uint64, month int, year int) ([]types.Shift, error) 
 	return results, err
 }
 
+func CreateUser(user types.NewUser, requesterID uint64) {
+	_, err := db.Exec("CALL CreateUser(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		user.Username,
+		user.HashedPassword,
+		user.Salt,
+		user.FirstName,
+		user.LastName,
+		user.HourlyPayCents,
+		user.Role,
+		user.PreferredPaymentMethod,
+		requesterID,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func GetAllUsers() ([]types.User, error) {
 	rows, err := db.Query("CALL GetAllUsers()")
 	if err != nil {
@@ -218,7 +234,6 @@ func GetUser(userID uint64) (types.User, error) {
 		log.Fatal(err)
 	}
 
-	fmt.Println(result)
 	return result, err
 }
 

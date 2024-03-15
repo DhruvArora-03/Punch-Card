@@ -25,23 +25,28 @@ type claims struct {
 }
 
 // generate salt of 16 random bytes
-func GenerateSalt() ([]byte, error) {
+func GenerateSalt() (string, error) {
 	salt := make([]byte, 16)
 	_, err := rand.Read(salt) // Read random data from the crypto/rand package
-	return salt, err
+	return hex.EncodeToString(salt), err
 }
 
 // input: password
 // output: hash, err, saltUsed
-func HashPassword(password string, salt []byte) (string, error) {
+func HashPassword(password string, salt string) (string, error) {
 	// password is a hex string so turn into bytes
 	decodedPassword, err := hex.DecodeString(password)
 	if err != nil {
 		return "", err
 	}
+	// same with salt
+	decodedSalt, err := hex.DecodeString(salt)
+	if err != nil {
+		return "", err
+	}
 
 	// now add salt and hash
-	combined := append(decodedPassword, salt...)
+	combined := append(decodedPassword, decodedSalt...)
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(combined), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
