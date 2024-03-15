@@ -39,7 +39,7 @@ export default function NavBar(props: NavBarProps) {
   return (
     <div className={styles.navbar}>
       <Item to="/">
-        <img src={logo} className={styles.logo} />
+        <img src={logo} />
       </Item>
 
       <div className={styles.navbarItems}>
