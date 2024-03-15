@@ -25,7 +25,6 @@ func GetStatusHandler(w http.ResponseWriter, r *http.Request) {
 
 	isClockedIn, clockInTime, notes, err := db.GetClockInStatus(userID)
 	if err != nil {
-		fmt.Println(err)
 		http.Error(w, "Couldn't retrieve current user status", http.StatusInternalServerError)
 		return
 	}
