@@ -13,6 +13,7 @@ import Button from "components/Button";
 import { DisplayUser, InternalUser } from "lib/types";
 import TextInput from "components/TextInput";
 import axios, { AxiosResponse } from "axios";
+import BackLink from "components/BackLink";
 
 export default function EditUser() {
   const authHeader = useAuthHeader();
@@ -48,22 +49,20 @@ export default function EditUser() {
           headers: { Authorization: authHeader() },
         }
       )
-      .then(console.log);
+      .then(console.log)
+      .catch(setError);
   };
 
   return (
     <div className={styles.page}>
+      <BackLink to="/users" />
       <h1>Editing user with id: {user_id} </h1>
       <small>{error?.message}</small>
 
       {originalValues && (
         <Formik initialValues={originalValues} onSubmit={submitUpdate}>
-          {({ handleSubmit, handleReset, handleBlur, isSubmitting }) => (
-            <Form
-              onSubmit={handleSubmit}
-              onReset={handleReset}
-              onBlur={handleBlur}
-            >
+          {({ handleSubmit, handleReset, isSubmitting }) => (
+            <Form onSubmit={handleSubmit} onReset={handleReset}>
               <TextInput field_id="username" />
               <TextInput field_id="first_name" />
               <TextInput field_id="last_name" />
