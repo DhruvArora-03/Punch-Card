@@ -5,28 +5,13 @@ import { useSignIn } from "react-auth-kit";
 import { Form, FormControl, InputGroup } from "react-bootstrap";
 import styles from "./login.module.css";
 import Button from "components/Button";
+import { hashPassword } from "lib/index";
 
 export default function LoginPage() {
   const [error, setError] = useState<Error>();
   const [isLoading, setIsLoading] = useState(false);
   const signIn = useSignIn();
-  const encoder = new TextEncoder();
 
-  const hashPassword = async (password: string) => {
-    // encode
-    const passwordBuffer = encoder.encode(password);
-    // hash
-    return (
-      window.crypto.subtle
-        .digest("SHA-256", passwordBuffer)
-        // decode
-        .then((hashBuffer) =>
-          Array.from(new Uint8Array(hashBuffer))
-            .map((byte) => byte.toString(16).padStart(2, "0"))
-            .join("")
-        )
-    );
-  };
 
   const onSubmit = async (values: { username: string; password: string }) => {
     setError(undefined);

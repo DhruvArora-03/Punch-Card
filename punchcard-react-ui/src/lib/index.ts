@@ -1,6 +1,23 @@
 import axios from "axios";
 import { DisplayUser, InternalUser, setStateType } from "./types";
 
+export async function hashPassword(password: string) {
+  // encode
+  const encoder = new TextEncoder();
+  const passwordBuffer = encoder.encode(password);
+  // hash
+  return (
+    window.crypto.subtle
+      .digest("SHA-256", passwordBuffer)
+      // decode
+      .then((hashBuffer) =>
+        Array.from(new Uint8Array(hashBuffer))
+          .map((byte) => byte.toString(16).padStart(2, "0"))
+          .join("")
+      )
+  );
+}
+
 export async function apiWrapper(
   apiCall: () => Promise<void>,
   setError: setStateType<Error | undefined>,
