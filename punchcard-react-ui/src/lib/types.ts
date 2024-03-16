@@ -20,15 +20,15 @@ export type InternalUser = {
 };
 
 // swap out cents for normal and take out user_id
-export type DisplayUser = Omit<InternalUser, "hourly_pay_cents"> & {
+export type DisplayUser = Omit<InternalUser, "hourly_pay_cents" | "user_id"> & {
   hourly_pay: number;
 };
 
-export type NewUser = InternalUser & {
-  // pas
-}
+export type NewUser = DisplayUser & {
+  password: string;
+};
 
 export type FormItemProps = {
   label?: string;
-  field_id: keyof DisplayUser;
+  field_id: string;
 };

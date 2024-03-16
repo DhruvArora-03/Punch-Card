@@ -123,29 +123,23 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("%s ~/user\n\n", r.Method)
 
 	var err error
-	var userIDParam uint64
+	var userID uint64
 
 	// get params
 	vars := mux.Vars(r)
 
-	userIDParam, err = strconv.ParseUint(vars["userID"], 10, 64)
+	userID, err = strconv.ParseUint(vars["userID"], 10, 64)
 	if err != nil {
 		http.Error(w, "Invalid URL month param", http.StatusBadRequest)
 	}
 
 	// the expected request body
-	var request types.User
+	var request types.UserWithoutID
 
 	// check if body matches
 	err = json.NewDecoder(r.Body).Decode(&request)
 	if err != nil && err.Error() != "EOF" {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-
-	// check that param matches request body
-	if request.UserID != userIDParam {
-		http.Error(w, "Invalid request parameter - ensure user_id matches", http.StatusBadRequest)
 		return
 	}
 
@@ -156,7 +150,7 @@ func UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db.UpdateUser(request, requesterID)
+	db.UpdateUser(userID, request, requesterID)
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
