@@ -237,16 +237,16 @@ func GetUser(userID uint64) (types.User, error) {
 	return result, err
 }
 
-func UpdateUser(user types.User, updater_id uint64) {
+func UpdateUser(userID uint64, user types.UserWithoutID, updaterID uint64) {
 	_, err := db.Exec("CALL UpdateUser(?, ?, ?, ?, ?, ?, ?, ?)",
-		user.UserID,
+		userID,
 		user.Username,
 		user.FirstName,
 		user.LastName,
 		user.HourlyPayCents,
 		user.Role,
 		user.PreferredPaymentMethod,
-		updater_id,
+		updaterID,
 	)
 	if err != nil {
 		log.Fatal(err)
