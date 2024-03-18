@@ -1,5 +1,11 @@
 import axios from "axios";
-import { DisplayUser, InternalUser, setStateType } from "./types";
+import {
+  ApiUser,
+  DisplayUser,
+  InternalUser,
+  NewDisplayUser,
+  setStateType,
+} from "./types";
 
 export async function hashPassword(password: string) {
   // encode
@@ -54,11 +60,13 @@ export function convertUserToDisplay(user: InternalUser) {
   } satisfies DisplayUser;
 }
 
-export function convertUserFromDisplay(user: DisplayUser) {
+export function convertUserFromDisplayForApi(
+  user: DisplayUser
+) {
   const { hourly_pay: pay, ...rest } = user;
 
   return {
     hourly_pay_cents: Math.floor(pay * 100),
     ...rest,
-  } satisfies InternalUser;
+  } satisfies ApiUser;
 }

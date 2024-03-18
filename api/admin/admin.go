@@ -18,7 +18,7 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("%s ~/users\n\n", r.Method)
 
 	// the expected request body
-	var request types.CreateUserRequest
+	var request types.UserWithoutID
 
 	// check if body matches
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -41,7 +41,8 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user.HashedPassword, err = auth.HashPassword(request.Password, user.Salt)
+	// default password is "password"
+	user.HashedPassword, err = auth.HashPassword("password", user.Salt)
 	if err != nil {
 		http.Error(w, "Internal error, could not hash password - "+err.Error(), http.StatusInternalServerError)
 		return

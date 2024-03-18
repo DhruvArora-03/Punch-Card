@@ -10,13 +10,8 @@ type UserWithoutID struct {
 }
 
 type User struct {
-	UserWithoutID	
-	UserID                 uint64 `json:"user_id"`
-}
-
-type CreateUserRequest struct {
 	UserWithoutID
-	Password string `json:"password"`
+	UserID uint64 `json:"user_id"`
 }
 
 type NewUser struct {

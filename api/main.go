@@ -27,7 +27,7 @@ func setupRoutes() *mux.Router {
 	r.HandleFunc("/clock-notes", auth.ValidateToken(shifts.SaveNotesHandler)).Methods("PUT")
 	r.HandleFunc("/shift-history/{month:[0-9]+}/{year:[0-9]+}", auth.ValidateToken(shifts.GetShiftHistoryHandler)).Methods("GET")
 
-	// admin authed routes
+	// Defined admin-level routes
 	r.HandleFunc("/users", auth.CheckAuthorization(auth.ValidateToken(admin.CreateUserHandler))).Methods("POST")
 	r.HandleFunc("/users", auth.CheckAuthorization(auth.ValidateToken(admin.GetAllUsersHandler))).Methods("GET")
 	r.HandleFunc("/users/{userID:[0-9]+}", auth.CheckAuthorization(auth.ValidateToken(admin.GetUserHandler))).Methods("GET")

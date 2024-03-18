@@ -2,7 +2,7 @@ import { useParams } from "router";
 import styles from "./users.module.css";
 import { Formik } from "Formik";
 import {
-  convertUserFromDisplay,
+  convertUserFromDisplayForApi,
   convertUserToDisplay,
   handleStaleAuthorization,
 } from "lib/index";
@@ -44,7 +44,7 @@ export default function EditUser() {
     await axios
       .put(
         `http://localhost:8080/users/${user_id}`,
-        convertUserFromDisplay(values),
+        convertUserFromDisplayForApi(values),
         {
           headers: { Authorization: authHeader() },
         }
@@ -62,7 +62,11 @@ export default function EditUser() {
       {originalValues && (
         <Formik initialValues={originalValues} onSubmit={submitUpdate}>
           {({ handleSubmit, handleReset, isSubmitting }) => (
-            <Form onSubmit={handleSubmit} onReset={handleReset}>
+            <Form
+              className={styles.form}
+              onSubmit={handleSubmit}
+              onReset={handleReset}
+            >
               <TextInput field_id="username" />
               <TextInput field_id="first_name" />
               <TextInput field_id="last_name" />

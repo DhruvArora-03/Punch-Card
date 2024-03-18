@@ -19,13 +19,12 @@ export type InternalUser = {
   preferred_payment_method: string;
 };
 
-// swap out cents for normal and take out user_id
-export type DisplayUser = Omit<InternalUser, "hourly_pay_cents" | "user_id"> & {
-  hourly_pay: number;
-};
+// take out user_id
+export type ApiUser = Omit<InternalUser, "user_id">;
 
-export type NewUser = DisplayUser & {
-  password: string;
+// swap out cents for normal
+export type DisplayUser = Omit<ApiUser, "hourly_pay_cents"> & {
+  hourly_pay: number;
 };
 
 export type FormItemProps = {
